@@ -1,4 +1,4 @@
-package com.reza.mapapp;
+package com.reza.map;
 
 import android.os.Bundle;
 
