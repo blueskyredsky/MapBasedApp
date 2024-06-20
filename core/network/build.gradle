@@ -3,12 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.reza.map'
+    namespace 'com.reza.network'
     compileSdk 34
 
     defaultConfig {
         minSdk 24
-        targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -30,10 +29,6 @@ dependencies {
 
     implementation libs.appcompat
     implementation libs.material
-
-    // map sdk
-    implementation libs.play.services.maps
-
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

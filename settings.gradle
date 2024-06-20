@@ -23,3 +23,7 @@ rootProject.name = "MapApp"
 include ':app'
 include ':feature:map'
 include ':core:test'
+include ':core:location'
+include ':core:common'
+include ':core:network'
+include ':core:database'
