@@ -4,9 +4,12 @@ import android.content.Context;
 
 import com.reza.di.LocationModule;
 
+import javax.inject.Singleton;
+
 import dagger.BindsInstance;
 import dagger.Component;
 
+@Singleton
 @Component(modules = {LocationModule.class})
 public interface ApplicationComponent {
 

@@ -6,7 +6,9 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class DefaultLocationManager implements LocationManager {
 
     private Context context;
