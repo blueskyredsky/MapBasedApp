@@ -37,7 +37,6 @@ android {
 }
 
 dependencies {
-
     // projects
     implementation project(":feature:map")
     implementation project(":core:location")
