@@ -7,6 +7,7 @@ android {
 dependencies {
     // project
     implementation project(":core:location")
+    implementation project(":core:common")
 
     // map sdk
     implementation libs.play.services.maps

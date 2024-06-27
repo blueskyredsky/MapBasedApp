@@ -1,4 +1,4 @@
-package com.reza.map;
+package com.reza.map.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -18,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.reza.map.R;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 

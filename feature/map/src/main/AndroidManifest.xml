@@ -5,7 +5,7 @@
 
 
         <activity
-            android:name=".MapActivity"
+            android:name=".ui.MapActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
