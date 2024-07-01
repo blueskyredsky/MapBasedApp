@@ -23,7 +23,7 @@ public class DefaultLocationManager implements LocationManager {
     }
 
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission") // todo: check if permission is granted
     @Override
     public Single<Location> getLastLocation() {
         return Single.create(emitter ->

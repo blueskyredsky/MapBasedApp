@@ -40,6 +40,8 @@ dependencies {
     // projects
     implementation project(":feature:map")
     implementation project(":core:location")
+    implementation project(":core:threading")
+    implementation project(":core:common")
     testImplementation project(":core:test")
 
     implementation libs.appcompat
@@ -50,6 +52,10 @@ dependencies {
     // dagger 2
     implementation libs.dagger
     annotationProcessor libs.dagger.compiler
+
+    // RxJava
+    implementation libs.rxjava
+    implementation libs.rxandroid
 
     // tests
     testImplementation libs.junit

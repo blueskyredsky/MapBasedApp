@@ -1,4 +1,4 @@
-package com.reza.common.di.schedulers;
+package com.reza.threading.schedulers;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

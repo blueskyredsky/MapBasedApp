@@ -1,0 +1,9 @@
+apply from: "$rootProject.projectDir/android-lib.gradle"
+
+android {
+    namespace 'com.reza.threading'
+}
+
+dependencies {
+
+}
