@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -18,16 +19,38 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
+import com.reza.map.data.di.MapComponent;
+import com.reza.map.data.di.MapComponentProvider;
+import com.reza.map.data.di.MapViewModelModule;
+
+import java.util.Map;
+
+import javax.inject.Inject;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    MapComponent mapComponent;
+
+    @Inject
+    ViewModelFactory viewModelFactory;
+
+    private MapViewModel viewModel;
 
     private static final int REQUEST_LOCATION = 1;
     private GoogleMap map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        mapComponent = ((MapComponentProvider) getApplicationContext()).provideMapComponent();
+        mapComponent.inject(this);
+
         super.onCreate(savedInstanceState);
+
+        viewModel = new ViewModelProvider(this, viewModelFactory).get(MapViewModel.class);
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.map), (v, insets) -> {

@@ -37,6 +37,9 @@ dependencies {
     implementation libs.rxjava
     implementation libs.rxandroid
 
+    // lifecycle
+    implementation libs.lifecycle.extensions
+
     // unit tests
     testImplementation libs.junit
 
