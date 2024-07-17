@@ -1,7 +1,5 @@
 package com.reza.common.viewmodel;
 
-import javax.inject.Provider;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -9,9 +7,8 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.Provider;
 
-@Singleton
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
     private final Map<Class<? extends ViewModel>, Provider<ViewModel>> creators;

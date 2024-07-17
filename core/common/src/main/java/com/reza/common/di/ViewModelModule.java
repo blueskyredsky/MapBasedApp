@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.reza.common.viewmodel.ViewModelFactory;
 
+import javax.inject.Singleton;
+
 import dagger.Binds;
 import dagger.Module;
 
