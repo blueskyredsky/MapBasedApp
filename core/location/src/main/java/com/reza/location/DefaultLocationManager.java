@@ -31,7 +31,7 @@ public class DefaultLocationManager implements LocationManager {
     public Single<Location> getLastLocation() {
         return Single.create(emitter -> {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
+                    != PackageManager.PERMISSION_GRANTED) {
                 emitter.onError(new Exception(context.getString(R.string.permission_is_not_granted)));
             } else {
                 fusedLocationClient.getLastLocation().addOnCompleteListener(task -> {

@@ -3,7 +3,9 @@ package com.reza.map.ui;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -34,9 +36,18 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import io.reactivex.Scheduler;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    MapComponent mapComponent;
+    private MapComponent mapComponent;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -53,7 +64,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     // Permission is granted. Continue the action or workflow in your
-                    // app.
+                    // app..
+                    showCurrentLocationOnMap();
                 } else {
                     // Explain to the user that the feature is unavailable because the
                     // feature requires a permission that the user has denied. At the
@@ -93,11 +105,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         getCurrentLocation();
-
-        // todo the following codes should be removed
-        LatLng sydney = new LatLng(-34.0, 151.0);
-        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     private void getCurrentLocation() {
@@ -105,7 +112,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
-            // todo get last location from fused location provider (in form of observable)
+            showCurrentLocationOnMap();
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             // In an educational UI, explain to the user why your app requires this
@@ -120,13 +127,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             requestPermissionLauncher.launch(
                     Manifest.permission.ACCESS_FINE_LOCATION);
         }
+    }
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestLocationPermissions();
-        } else {
-            // todo get last location from fused location provider (in form of observable)
-        }
+    private void showCurrentLocationOnMap() {
+        compositeDisposable.add(viewModel.getLastLocation()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess(location -> {
+                    LatLng userCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    map.addMarker(new MarkerOptions().position(userCurrentLocation).title("You are here!"));
+                    map.moveCamera(CameraUpdateFactory.newLatLng(userCurrentLocation));
+                })
+                .doOnError(error -> Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show())
+                .subscribe());
     }
 
     /**
@@ -135,8 +148,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      */
     private void showEducationalDialogForLocationPermission() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("This app requires location permission to work properly.")
-                .setTitle("Location Permission Required")
+        builder.setTitle(R.string.title_educational_dialog)
+                .setMessage(R.string.description_educational_dialog)
                 .setPositiveButton(R.string.ok, (dialog, id) -> {
                     // User taps OK button.
                 })
@@ -146,15 +159,4 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .create()
                 .show();
     }
-
-    /**
-     * Requests location permissions from the user.
-     * This method prompts the user to grant the app access to fine location data.
-     */
-    private void requestLocationPermissions() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                REQUEST_LOCATION);
-    }
-
-
 }
