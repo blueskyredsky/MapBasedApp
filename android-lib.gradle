@@ -42,6 +42,8 @@ dependencies {
 
     // unit tests
     testImplementation libs.junit
+    testImplementation libs.mockito.core
+    testImplementation libs.truth
 
     // ui tests
     androidTestImplementation libs.ext.junit
