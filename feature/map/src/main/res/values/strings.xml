@@ -4,4 +4,5 @@
     <string name="cancel">Cancel</string>
     <string name="title_educational_dialog">Location Permission Required</string>
     <string name="description_educational_dialog">This app requires location permission to work properly.</string>
+    <string name="you_are_here">You are here!</string>
 </resources>

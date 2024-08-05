@@ -1,9 +1,7 @@
 package com.reza.map.ui;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -30,29 +28,23 @@ import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
 import com.reza.map.data.di.MapComponent;
 import com.reza.map.data.di.MapComponentProvider;
-import com.reza.map.data.di.MapViewModelModule;
-
-import java.util.Map;
 
 import javax.inject.Inject;
 
-import io.reactivex.Scheduler;
-import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    @Inject
+    CompositeDisposable compositeDisposable;
 
     @Inject
     ViewModelFactory viewModelFactory;
 
     private MapViewModel viewModel;
 
-    private static final int REQUEST_LOCATION = 1;
     private GoogleMap map;
 
     // Register the permissions callback, which handles the user's response to the
@@ -61,15 +53,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
-                    // Permission is granted. Continue the action or workflow in your
-                    // app..
                     showCurrentLocationOnMap();
                 } else {
-                    // Explain to the user that the feature is unavailable because the
-                    // feature requires a permission that the user has denied. At the
-                    // same time, respect the user's decision. Don't link to system
-                    // settings in an effort to convince the user to change their
-                    // decision.
+                    showEducationalDialogForLocationPermission();
                 }
             });
 
@@ -127,17 +113,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Retrieves the last known location from the ViewModel and displays it on the map.
+     * This method subscribes to the ViewModel's getLastLocation() observable,
+     * which emits the last known location. Upon receiving the location, it adds a marker
+     * to the map at the user's current location and moves the camera to focus on that location.
+     * If an error occurs during location retrieval, a toast message is displayed with the error.
+     */
     private void showCurrentLocationOnMap() {
         compositeDisposable.add(viewModel.getLastLocation()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess(location -> {
+                .subscribe(location -> {
                     LatLng userCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    map.addMarker(new MarkerOptions().position(userCurrentLocation).title("You are here!"));
+                    map.addMarker(new MarkerOptions().position(userCurrentLocation).title(getString(R.string.you_are_here)));
                     map.moveCamera(CameraUpdateFactory.newLatLng(userCurrentLocation));
-                })
-                .doOnError(error -> Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show())
-                .subscribe());
+                }, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
     /**
@@ -148,12 +139,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.title_educational_dialog)
                 .setMessage(R.string.description_educational_dialog)
-                .setPositiveButton(R.string.ok, (dialog, id) -> {
-                    // User taps OK button.
-                })
-                .setNegativeButton(R.string.cancel, (dialog, id) -> {
-                    // User cancels the dialog.
-                })
+                .setPositiveButton(R.string.ok, (dialog, id) -> requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION))
+                .setNegativeButton(R.string.cancel, null) // A null listener allows the button to dismiss the dialog and take no further action.
                 .create()
                 .show();
     }
