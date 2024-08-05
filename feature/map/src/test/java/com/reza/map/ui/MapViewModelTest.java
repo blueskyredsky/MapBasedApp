@@ -21,9 +21,6 @@ import io.reactivex.observers.TestObserver;
 @RunWith(MockitoJUnitRunner.class)
 public class MapViewModelTest {
 
-    @Captor
-    ArgumentCaptor<Location> locationCaptor;
-
     @Mock
     private LocationManager locationManager;
 
@@ -38,21 +35,27 @@ public class MapViewModelTest {
 
     @After
     public void tearDown() {
-
+        /* NO-OP */
     }
 
     @Test
-    public void testLastLocationIsSuccessful() {
+    public void shouldReturnLocationWhenFetchingLocationIsSuccessful() {
         Mockito.when(locationManager.getLastLocation()).thenReturn(Single.just(location));
 
         TestObserver<Location> testObserver = viewModel.getLastLocation().test();
 
-        Truth.assertThat(testObserver.valueCount()).isEqualTo(1);
+        testObserver.assertValue(location);
         testObserver.dispose();
     }
 
     @Test
-    public void testLastLocationIsNotSuccessful() {
+    public void shouldReturnThrowableWhenFetchingLocationIsNotSuccessful() {
+        Throwable throwable = new Throwable("Location is null");
+        Mockito.when(locationManager.getLastLocation()).thenReturn(Single.error(throwable));
 
+        TestObserver<Location> testObserver = viewModel.getLastLocation().test();
+
+        testObserver.assertError(throwable);
+        testObserver.dispose();
     }
 }
