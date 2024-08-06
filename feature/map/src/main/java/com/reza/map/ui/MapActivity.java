@@ -18,6 +18,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,9 +29,12 @@ import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
 import com.reza.map.data.di.MapComponent;
 import com.reza.map.data.di.MapComponentProvider;
+import com.reza.threading.schedulers.IoScheduler;
+import com.reza.threading.schedulers.MainScheduler;
 
 import javax.inject.Inject;
 
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -42,6 +46,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Inject
     ViewModelFactory viewModelFactory;
+
+    @IoScheduler
+    @Inject
+    Scheduler ioScheduler;
+
+    @MainScheduler
+    @Inject
+    Scheduler mainScheduler;
 
     private MapViewModel viewModel;
 
@@ -91,6 +103,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         getCurrentLocation();
     }
 
+    /**
+     * Checks and requests location permission if necessary.
+     * This method verifies if the app has permission to access fine location.* If permission is granted, it proceeds to display the current location on the map.
+     * If permission is not granted and the user should be shown a rationale, an educational dialog is displayed.
+     * Otherwise, the method directly requests the location permission.
+     */
     private void getCurrentLocation() {
         if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -101,7 +119,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             // In an educational UI, explain to the user why your app requires this
             // permission for a specific feature to behave as expected, and what
-            // features are disabled if it's declined. In this UI, include a
+            // features are disabled if it's declined. In this UI,include a
             // "cancel" or "no thanks" button that lets the user continue
             // using your app without granting the permission.
             showEducationalDialogForLocationPermission();
@@ -122,12 +140,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      */
     private void showCurrentLocationOnMap() {
         compositeDisposable.add(viewModel.getLastLocation()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(ioScheduler)
+                .observeOn(mainScheduler)
                 .subscribe(location -> {
                     LatLng userCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     map.addMarker(new MarkerOptions().position(userCurrentLocation).title(getString(R.string.you_are_here)));
-                    map.moveCamera(CameraUpdateFactory.newLatLng(userCurrentLocation));
+                    CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userCurrentLocation, 16.0f);
+                    map.moveCamera(update);
                 }, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
