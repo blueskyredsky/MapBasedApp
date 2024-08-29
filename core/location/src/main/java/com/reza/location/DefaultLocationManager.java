@@ -84,7 +84,7 @@ public class DefaultLocationManager implements LocationManager {
                 };
             }
         }, BackpressureStrategy.BUFFER);
-        LocationCallback locationCallback = new LocationCallback() {
+        /*LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) {
@@ -115,6 +115,6 @@ public class DefaultLocationManager implements LocationManager {
                         .build(),
                 locationCallback, null);
         final long timeInterval = 5000;
-        return Flowable.just(new Location(""));
+        return Flowable.just(new Location(""));*/
     }
 }
