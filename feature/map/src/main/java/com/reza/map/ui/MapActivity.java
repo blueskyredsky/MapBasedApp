@@ -3,6 +3,7 @@ package com.reza.map.ui;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -144,6 +145,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .observeOn(mainScheduler)
                 .subscribe(location -> {
                     LatLng userCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    map.clear();
                     map.addMarker(new MarkerOptions().position(userCurrentLocation).title(getString(R.string.you_are_here)));
                     CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userCurrentLocation, 16.0f);
                     map.moveCamera(update);
@@ -162,5 +164,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .setNegativeButton(R.string.cancel, null) // A null listener allows the button to dismiss the dialog and take no further action.
                 .create()
                 .show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        if (requestingLocationUpdates) {
+//            viewModel.startLocationUpdates();
+//        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        viewModel.stopLocationUpdates();
     }
 }

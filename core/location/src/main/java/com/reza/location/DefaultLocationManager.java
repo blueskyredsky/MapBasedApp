@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
@@ -111,7 +112,7 @@ public class DefaultLocationManager implements LocationManager {
                         }
                     }
                 };
-                if (locationRequest != null) {
+                if (locationRequest == null) {
                     locationRequest = createLocationRequest();
                 }
                 // start location updates
@@ -120,11 +121,12 @@ public class DefaultLocationManager implements LocationManager {
         }, BackpressureStrategy.LATEST);
     }
 
-    /**
-     * Stops location updates from the Fused Location Provider.
-     * This method removes the registered location callback, effectively stopping the delivery of
-     * location updates.
-     */
+    @Override
+    public void startLocationUpdates() {
+        // todo to be completed
+    }
+
+
     @Override
     public void stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback);

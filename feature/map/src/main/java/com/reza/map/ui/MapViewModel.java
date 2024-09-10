@@ -8,6 +8,8 @@ import com.reza.location.LocationManager;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 public class MapViewModel extends ViewModel {
@@ -21,5 +23,13 @@ public class MapViewModel extends ViewModel {
 
     public Single<Location> getLastLocation() {
         return locationManager.getLastLocation();
+    }
+
+    public Flowable<Location> getLocationUpdates() {
+        return locationManager.getLocationUpdates();
+    }
+
+    public Completable stopLocationUpdates() {
+        return locationManager.stopLocationUpdates();
     }
 }
