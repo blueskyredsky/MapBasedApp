@@ -88,42 +88,42 @@ public class DefaultLocationManager implements LocationManager {
 
     /**
      * Provides a stream of location updates.
-     * This method checks for location permission and, if granted, requests location updates
-     * from the Fused Location Provider.
-     * It emits each location update as it becomes available.
-     * If permission is denied, it emits an error.
+     * This method requests location updates from the Fused Location Provider and emits each update
+     * as it becomes available using a {@link Flowable}.
      * Backpressure is handled using {@link BackpressureStrategy#LATEST}, ensuring that only the
      * latest location update is kept if the consumer cannot keep up with the emission rate.
      *
-     * @return A {@link Flowable} that emits location updates or an error.
+     * @return A {@link Flowable} that emits location updates.
      */
     @Override
     public Flowable<Location> getLocationUpdates() {
         return Flowable.create(emitter -> {
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                emitter.onError(new Exception(context.getString(R.string.permission_is_not_granted)));
-            } else {
-                locationCallback = new LocationCallback() {
-                    @Override
-                    public void onLocationResult(@NonNull LocationResult locationResult) {
-                        for (Location location : locationResult.getLocations()) {
-                            emitter.onNext(location);
-                        }
+            locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(@NonNull LocationResult locationResult) {
+                    for (Location location : locationResult.getLocations()) {
+                        emitter.onNext(location);
                     }
-                };
-                if (locationRequest == null) {
-                    locationRequest = createLocationRequest();
                 }
-                // start location updates
-                fusedLocationClient.requestLocationUpdates(Objects.requireNonNull(locationRequest, "locationRequest must not be null"), locationCallback, Looper.getMainLooper());
-            }
+            };
         }, BackpressureStrategy.LATEST);
     }
 
     @Override
-    public void startLocationUpdates() {
-        // todo to be completed
+    public Completable startLocationUpdates() {
+        return Completable.create(emitter -> {
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        emitter.onError(new Exception(context.getString(R.string.permission_is_not_granted)));
+                    } else {
+                        if (locationRequest == null) {
+                            locationRequest = createLocationRequest();
+                        }
+                        fusedLocationClient.requestLocationUpdates(Objects.requireNonNull(locationRequest, "locationRequest must not be null"), locationCallback, Looper.getMainLooper());
+                        emitter.onComplete();
+                    }
+                }
+        );
     }
 
 

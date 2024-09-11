@@ -21,10 +21,10 @@ public interface LocationManager {
     /**
      * Starts location updates.
      */
-    void startLocationUpdates();
+    Completable startLocationUpdates();
 
     /**
-     * Stops location updates from the Fused Location Provider.
+     * Stops location updates.
      */
     void stopLocationUpdates();
 }
