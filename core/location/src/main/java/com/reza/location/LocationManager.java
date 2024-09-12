@@ -26,5 +26,5 @@ public interface LocationManager {
     /**
      * Stops location updates.
      */
-    void stopLocationUpdates();
+    Completable stopLocationUpdates();
 }

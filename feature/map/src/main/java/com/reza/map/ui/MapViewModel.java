@@ -29,8 +29,8 @@ public class MapViewModel extends ViewModel {
         return locationManager.getLocationUpdates();
     }
 
-    public void stopLocationUpdates() {
-        locationManager.stopLocationUpdates();
+    public Completable stopLocationUpdates() {
+        return locationManager.stopLocationUpdates();
     }
 
     public Completable startLocationUpdates() {

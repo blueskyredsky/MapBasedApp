@@ -60,8 +60,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private GoogleMap map;
 
-    private Boolean requestingLocationUpdates = true;
-
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
     // ActivityResultLauncher, as an instance variable.
@@ -142,7 +140,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * If an error occurs during location retrieval, a toast message is displayed with the error.
      */
     private void showCurrentLocationOnMap() {
-        compositeDisposable.add(viewModel.getLastLocation()
+        compositeDisposable.add(viewModel.getLocationUpdates()
                 .subscribeOn(ioScheduler)
                 .observeOn(mainScheduler)
                 .subscribe(location -> {
@@ -171,24 +169,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
-        if (requestingLocationUpdates) {
-            compositeDisposable.add(
-                    viewModel.startLocationUpdates()
-                            .subscribeOn(ioScheduler)
-                            .observeOn(mainScheduler)
-                            .subscribe(() -> {
-                                requestingLocationUpdates = false;
-                                // todo adding a timber.d
-                            }, throwable -> {
-                                Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            })
-            );
-        }
+        compositeDisposable.add(
+                viewModel.startLocationUpdates()
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainScheduler)
+                        .subscribe(() -> {
+                            Log.i("TAG", "onResume: ");
+                            // todo adding a timber.d
+                        }, throwable -> {
+                            Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        })
+        );
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        viewModel.stopLocationUpdates();
+        compositeDisposable.add(
+                viewModel.stopLocationUpdates()
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainScheduler)
+                        .subscribe(() -> {
+                            // todo adding a timber.d
+                        }, throwable -> {
+                            Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        })
+        );
     }
 }

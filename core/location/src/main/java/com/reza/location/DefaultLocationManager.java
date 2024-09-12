@@ -26,6 +26,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.processors.BehaviorProcessor;
 
 /**
  * This class provides methods for retrieving the last known location and receiving location updates
@@ -38,11 +39,21 @@ public class DefaultLocationManager implements LocationManager {
     private final Context context;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
+    private final BehaviorProcessor<Location> locations = BehaviorProcessor.create();
 
     @Inject
     DefaultLocationManager(Context context) {
         this.context = context;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                   locations.onNext(location);
+                }
+            }
+        };
     }
 
     /**
@@ -97,15 +108,13 @@ public class DefaultLocationManager implements LocationManager {
      */
     @Override
     public Flowable<Location> getLocationUpdates() {
-        return Flowable.create(emitter -> {
-            locationCallback = new LocationCallback() {
-                @Override
-                public void onLocationResult(@NonNull LocationResult locationResult) {
-                    for (Location location : locationResult.getLocations()) {
-                        emitter.onNext(location);
-                    }
+        return Flowable.create(emitter -> locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    emitter.onNext(location);
                 }
-            };
+            }
         }, BackpressureStrategy.LATEST);
     }
 
@@ -119,7 +128,10 @@ public class DefaultLocationManager implements LocationManager {
                         if (locationRequest == null) {
                             locationRequest = createLocationRequest();
                         }
-                        fusedLocationClient.requestLocationUpdates(Objects.requireNonNull(locationRequest, "locationRequest must not be null"), locationCallback, Looper.getMainLooper());
+                        if (locationCallback == null) {
+
+                        }
+                        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
                         emitter.onComplete();
                     }
                 }
@@ -128,7 +140,14 @@ public class DefaultLocationManager implements LocationManager {
 
 
     @Override
-    public void stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback);
+    public Completable stopLocationUpdates() {
+        return Completable.create(emitter -> {
+            try {
+                fusedLocationClient.removeLocationUpdates(locationCallback);
+                emitter.onComplete();
+            } catch (Exception exception) {
+                emitter.onError(exception);
+            }
+        });
     }
 }
