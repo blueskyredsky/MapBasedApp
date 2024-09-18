@@ -2,6 +2,7 @@ package com.reza.map.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -116,6 +117,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
             showCurrentLocationOnMap();
+            getLocationUpdates();
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             // In an educational UI, explain to the user why your app requires this
@@ -132,24 +134,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    /**
-     * Retrieves the last known location from the ViewModel and displays it on the map.
-     * This method subscribes to the ViewModel's getLastLocation() observable,
-     * which emits the last known location. Upon receiving the location, it adds a marker
-     * to the map at the user's current location and moves the camera to focus on that location.
-     * If an error occurs during location retrieval, a toast message is displayed with the error.
-     */
+    private void getLocationUpdates() {
+        compositeDisposable.add(viewModel.getLocationUpdates()
+                .subscribeOn(ioScheduler)
+                .observeOn(mainScheduler)
+                .subscribe(location -> {
+                    // todo handle location updates here
+                }, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show())
+        );
+    }
+
     private void showCurrentLocationOnMap() {
         compositeDisposable.add(viewModel.getLocationUpdates()
                 .subscribeOn(ioScheduler)
                 .observeOn(mainScheduler)
                 .subscribe(location -> {
-                    LatLng userCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    map.clear();
-                    map.addMarker(new MarkerOptions().position(userCurrentLocation).title(getString(R.string.you_are_here)));
-                    CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userCurrentLocation, 16.0f);
-                    map.moveCamera(update);
+                    LatLng userCurrentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    addMarkerToMap(userCurrentLatLng);
+                    moveCameraToLocation(userCurrentLatLng);
                 }, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+    }
+
+    private void addMarkerToMap(LatLng latLng) {
+        map.clear();
+        map.addMarker(new MarkerOptions().position(latLng).title(getString(R.string.you_are_here)));
+    }
+
+    private void moveCameraToLocation(LatLng latLng) {
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f);
+        map.moveCamera(update);
     }
 
     /**
@@ -174,7 +187,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
                         .subscribe(() -> {
-                            Log.i("TAG", "onResume: ");
                             // todo adding a timber.d
                         }, throwable -> {
                             Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();

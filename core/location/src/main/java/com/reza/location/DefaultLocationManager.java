@@ -38,22 +38,28 @@ public class DefaultLocationManager implements LocationManager {
     private final FusedLocationProviderClient fusedLocationClient;
     private final Context context;
     private LocationRequest locationRequest;
-    private LocationCallback locationCallback;
-    private final BehaviorProcessor<Location> locations = BehaviorProcessor.create();
+
+    /**
+     * A {@link BehaviorProcessor} used to store location updates.
+     */
+    private final BehaviorProcessor<Location> locationUpdatesFlowable = BehaviorProcessor.create();
+
+    /**
+     * A {@link LocationCallback} that handles location updates.
+     */
+    private final LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(@NonNull LocationResult locationResult) {
+            for (Location location : locationResult.getLocations()) {
+                locationUpdatesFlowable.onNext(location);
+            }
+        }
+    };
 
     @Inject
     DefaultLocationManager(Context context) {
         this.context = context;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
-
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
-                   locations.onNext(location);
-                }
-            }
-        };
     }
 
     /**
@@ -97,25 +103,9 @@ public class DefaultLocationManager implements LocationManager {
                 .build();
     }
 
-    /**
-     * Provides a stream of location updates.
-     * This method requests location updates from the Fused Location Provider and emits each update
-     * as it becomes available using a {@link Flowable}.
-     * Backpressure is handled using {@link BackpressureStrategy#LATEST}, ensuring that only the
-     * latest location update is kept if the consumer cannot keep up with the emission rate.
-     *
-     * @return A {@link Flowable} that emits location updates.
-     */
     @Override
     public Flowable<Location> getLocationUpdates() {
-        return Flowable.create(emitter -> locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
-                    emitter.onNext(location);
-                }
-            }
-        }, BackpressureStrategy.LATEST);
+        return locationUpdatesFlowable;
     }
 
     @Override
@@ -127,9 +117,6 @@ public class DefaultLocationManager implements LocationManager {
                     } else {
                         if (locationRequest == null) {
                             locationRequest = createLocationRequest();
-                        }
-                        if (locationCallback == null) {
-
                         }
                         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
                         emitter.onComplete();
