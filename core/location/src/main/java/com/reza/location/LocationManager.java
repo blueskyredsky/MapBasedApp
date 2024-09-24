@@ -6,6 +6,12 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
+/**
+ * Provides methods for managing and accessing location data.
+ * <p>
+ * This interface defines methods for retrieving the last known location,
+ * starting and stopping location updates, and receiving a stream of location updates.
+ */
 public interface LocationManager {
 
     /**
