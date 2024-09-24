@@ -75,7 +75,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         // providing mapComponent
         MapComponent mapComponent = ((MapComponentProvider) getApplicationContext()).provideMapComponent();
         mapComponent.inject(this);
@@ -107,7 +106,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Checks and requests location permission if necessary.
-     * This method verifies if the app has permission to access fine location.* If permission is granted, it proceeds to display the current location on the map.
+     * <p>
+     * This method verifies if the app has permission to access fine location.
+     * If permission is granted, it proceeds to display the current location on the map.
      * If permission is not granted and the user should be shown a rationale, an educational dialog is displayed.
      * Otherwise, the method directly requests the location permission.
      */
@@ -117,7 +118,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
             showCurrentLocationOnMap();
-            getLocationUpdates();
+//            getLocationUpdates();
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             // In an educational UI, explain to the user why your app requires this
@@ -134,6 +135,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Subscribes to location updates and handles them.
+     * <p>
+     * This method subscribes to the location updates Flowable from the ViewModel and handles
+     * each location update. It displays a toast message if an error occurs.
+     */
     private void getLocationUpdates() {
         compositeDisposable.add(viewModel.getLocationUpdates()
                 .subscribeOn(ioScheduler)
@@ -144,6 +151,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         );
     }
 
+    /**
+     * Displays the current location on the map.
+     * <p>
+     * This method subscribes to the location updates Flowable from the ViewModel and displays
+     * the current location on the map by adding a marker and moving the camera.
+     * It displays a toast message if an error occurs.
+     */
     private void showCurrentLocationOnMap() {
         compositeDisposable.add(viewModel.getLocationUpdates()
                 .subscribeOn(ioScheduler)
@@ -155,11 +169,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
+    /**
+     * Adds a marker to the map at the specified location.
+     *
+     * @param latLng The LatLng of the marker.
+     */
     private void addMarkerToMap(LatLng latLng) {
         map.clear();
         map.addMarker(new MarkerOptions().position(latLng).title(getString(R.string.you_are_here)));
     }
 
+    /**
+     * Moves the camera to the specified location.
+     *
+     * @param latLng The LatLng to move the camera to.
+     */
     private void moveCameraToLocation(LatLng latLng) {
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f);
         map.moveCamera(update);
@@ -167,7 +191,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Displays an educational dialog to the user explaining the need for location permission.
+     * <p>
      * The dialog provides "Ok" and "Cancel" buttons for user interaction.
+     * If the user clicks "Ok", the permission request is launched.
      */
     private void showEducationalDialogForLocationPermission() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
