@@ -1,6 +1,7 @@
 package com.reza.map.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -117,8 +118,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
-            showCurrentLocationOnMap();
+//            showCurrentLocationOnMap();
 //            getLocationUpdates();
+            map.setMyLocationEnabled(true);
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             // In an educational UI, explain to the user why your app requires this
