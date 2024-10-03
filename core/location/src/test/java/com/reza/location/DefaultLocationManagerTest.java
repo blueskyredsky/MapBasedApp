@@ -12,7 +12,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.Task;
 import com.google.common.truth.Truth;
 
 import org.junit.After;
@@ -20,10 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(shadows = {ShadowPreconditions.class})
 public class DefaultLocationManagerTest {
     Context context;
 
@@ -62,6 +60,22 @@ public class DefaultLocationManagerTest {
 
     @Test
     public void testShouldRequestLastKnownLocation() {
+        Task<Location> locationTask = LocationServices.getFusedLocationProviderClient(context)
+                .getLastLocation();
+        Truth.assertThat(locationTask).isNotNull();
+    }
 
+    @Test
+    public void testShouldRequestLocationUpdates() {
+        LocationRequest request = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).build();
+        LocationCallback callback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+
+            }
+        };
+        Task<Void> locationupdateTask = LocationServices.getFusedLocationProviderClient(context)
+                .requestLocationUpdates(request, callback, null);
+        Truth.assertThat(locationupdateTask).isNotNull();
     }
 }
