@@ -1,11 +1,8 @@
 package com.reza.map.ui;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -38,9 +35,7 @@ import com.reza.threading.schedulers.MainScheduler;
 import javax.inject.Inject;
 
 import io.reactivex.Scheduler;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 

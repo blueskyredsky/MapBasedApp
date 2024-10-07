@@ -12,4 +12,7 @@ dependencies {
 
     // map sdk
     implementation libs.play.services.maps
+
+    // places
+    implementation libs.places
 }
