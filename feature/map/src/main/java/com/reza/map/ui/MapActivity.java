@@ -25,12 +25,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PointOfInterest;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.reza.common.viewmodel.ViewModelFactory;
+import com.reza.map.BuildConfig;
 import com.reza.map.R;
 import com.reza.map.data.di.MapComponent;
 import com.reza.map.data.di.MapComponentProvider;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -56,6 +64,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private MapViewModel viewModel;
 
     private GoogleMap map;
+    private PlacesClient placesClient;
 
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
@@ -98,6 +107,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         getCurrentLocation();
+        setupPlacesClient();
+        map.setOnPoiClickListener(pointOfInterest -> {
+            Toast.makeText(this, pointOfInterest.name, Toast.LENGTH_LONG).show();
+        });
+    }
+
+    private void setupPlacesClient() {
+        Places.initialize(this, BuildConfig.GOOGLE_MAP_API_KEY);
+        placesClient = Places.createClient(this);
+    }
+
+    private void displayPoi(PointOfInterest pointOfInterest) {
+        String placeId = pointOfInterest.placeId;
+        List<Place.Field> placeFields = List.of(Place.Field.ID, Place.Field.NAME,
+                Place.Field.PHONE_NUMBER,
+                Place.Field.PHOTO_METADATAS,
+                Place.Field.ADDRESS,
+                Place.Field.LAT_LNG);
+
+        FetchPlaceRequest request = FetchPlaceRequest
+                .builder(placeId, placeFields)
+                .build();
+
+        placesClient.fetchPlace(request)
+                .addOnSuccessListener(response -> {
+
+                }).addOnFailureListener(e -> {
+
+                });
     }
 
     /**
