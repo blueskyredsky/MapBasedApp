@@ -4,7 +4,7 @@ import android.location.Location;
 
 import androidx.lifecycle.ViewModel;
 
-import com.reza.location.LocationManager;
+import com.reza.map.data.repository.LocationRepository;
 
 import javax.inject.Inject;
 
@@ -14,26 +14,26 @@ import io.reactivex.Single;
 
 public class MapViewModel extends ViewModel {
 
-    final LocationManager locationManager;
+    final LocationRepository locationRepository;
 
     @Inject
-    public MapViewModel(LocationManager locationManager) {
-        this.locationManager = locationManager;
+    public MapViewModel(LocationRepository locationRepository) {
+        this.locationRepository = locationRepository;
     }
 
     public Single<Location> getLastLocation() {
-        return locationManager.getLastLocation();
+        return locationRepository.getLastLocation();
     }
 
     public Flowable<Location> getLocationUpdates() {
-        return locationManager.getLocationUpdates();
+        return locationRepository.getLocationUpdates();
     }
 
     public Completable stopLocationUpdates() {
-        return locationManager.stopLocationUpdates();
+        return locationRepository.stopLocationUpdates();
     }
 
     public Completable startLocationUpdates() {
-        return locationManager.startLocationUpdates();
+        return locationRepository.startLocationUpdates();
     }
 }

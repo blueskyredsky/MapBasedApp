@@ -6,7 +6,7 @@ import com.reza.map.ui.MapActivity;
 import dagger.Subcomponent;
 
 @ActivityScope
-@Subcomponent(modules = {MapViewModelModule.class})
+@Subcomponent(modules = {MapViewModelModule.class, RepositoryModule.class})
 public interface MapComponent {
 
     // Factory that is used to create instances of this subcomponent

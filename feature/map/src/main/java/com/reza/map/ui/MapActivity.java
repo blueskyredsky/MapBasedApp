@@ -53,6 +53,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Inject
     ViewModelFactory viewModelFactory;
 
+    @Inject
+    PlacesClient placesClient;
+
     @IoScheduler
     @Inject
     Scheduler ioScheduler;
@@ -64,7 +67,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private MapViewModel viewModel;
 
     private GoogleMap map;
-    private PlacesClient placesClient;
 
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
@@ -107,15 +109,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         getCurrentLocation();
-        setupPlacesClient();
         map.setOnPoiClickListener(pointOfInterest -> {
             Toast.makeText(this, pointOfInterest.name, Toast.LENGTH_LONG).show();
         });
-    }
-
-    private void setupPlacesClient() {
-        Places.initialize(this, BuildConfig.GOOGLE_MAP_API_KEY);
-        placesClient = Places.createClient(this);
     }
 
     private void displayPoi(PointOfInterest pointOfInterest) {

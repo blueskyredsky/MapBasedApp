@@ -2,9 +2,23 @@ apply from: "$rootProject.projectDir/android-lib.gradle"
 
 android {
     namespace 'com.reza.location'
+
+    defaultConfig {
+        // Get the API keys from local.properties
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        buildConfigField "String", "GOOGLE_MAP_API_KEY", "${properties.getProperty('GOOGLE_MAP_API_KEY')}"
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {
     // location
     implementation libs.play.services.location
+
+    // places
+    implementation libs.places
 }
