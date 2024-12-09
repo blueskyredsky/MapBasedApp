@@ -18,7 +18,8 @@ android {
         // Get the API keys from local.properties
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        manifestPlaceholders = [googleMapsApiKey: "${properties.getProperty('GOOGLE_MAP_API_KEY')}"]
+
+        manifestPlaceholders = [googleMapsApiKey: properties.getProperty("GOOGLE_MAP_API_KEY")]
     }
 
     buildTypes {

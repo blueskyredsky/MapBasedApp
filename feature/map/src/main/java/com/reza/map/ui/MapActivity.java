@@ -53,8 +53,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Inject
     ViewModelFactory viewModelFactory;
 
-    @Inject
-    PlacesClient placesClient;
+    /*@Inject
+    PlacesClient placesClient;*/
 
     @IoScheduler
     @Inject
@@ -126,12 +126,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .builder(placeId, placeFields)
                 .build();
 
-        placesClient.fetchPlace(request)
-                .addOnSuccessListener(response -> {
-
-                }).addOnFailureListener(e -> {
-
-                });
+//        placesClient.fetchPlace(request)
+//                .addOnSuccessListener(response -> {
+//
+//                }).addOnFailureListener(e -> {
+//
+//                });
     }
 
     /**
