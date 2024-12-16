@@ -17,7 +17,7 @@ import dagger.Component;
 @Singleton
 @Component(modules = {
         LocationModule.class,
-       // PlacesModule.class,
+        PlacesModule.class,
         ThreadingModule.class,
         CommonModule.class,
         ViewModelModule.class,

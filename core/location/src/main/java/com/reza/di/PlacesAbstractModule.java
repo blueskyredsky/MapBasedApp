@@ -2,6 +2,6 @@ package com.reza.di;
 
 import dagger.Module;
 
-//@Module
-//public abstract class PlacesAbstractModule {
-//}
+@Module
+public abstract class PlacesAbstractModule {
+}

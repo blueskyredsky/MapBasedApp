@@ -14,10 +14,10 @@ import dagger.Provides;
 @Module/*(includes = PlacesAbstractModule.class)*/
 public class PlacesModule {
 
-    /*@Provides
+    @Provides
     @Singleton
     public PlacesClient providePlaces(Context context) {
         Places.initialize(context, BuildConfig.GOOGLE_MAP_API_KEY);
         return Places.createClient(context);
-    }*/
+    }
 }
