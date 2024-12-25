@@ -3,6 +3,7 @@ package com.reza.map.ui;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,6 +19,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.datatransport.cct.internal.LogEvent;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -47,14 +50,13 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private static final String TAG = "MapActivityTag";
+
     @Inject
     CompositeDisposable compositeDisposable;
 
     @Inject
     ViewModelFactory viewModelFactory;
-
-    /*@Inject
-    PlacesClient placesClient;*/
 
     @IoScheduler
     @Inject
@@ -116,22 +118,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void displayPoi(PointOfInterest pointOfInterest) {
         String placeId = pointOfInterest.placeId;
-        List<Place.Field> placeFields = List.of(Place.Field.ID, Place.Field.NAME,
-                Place.Field.PHONE_NUMBER,
+        List<Place.Field> placeFields = List.of(
+                Place.Field.ID,
+                Place.Field.DISPLAY_NAME,
+                Place.Field.INTERNATIONAL_PHONE_NUMBER,
                 Place.Field.PHOTO_METADATAS,
-                Place.Field.ADDRESS,
-                Place.Field.LAT_LNG);
+                Place.Field.FORMATTED_ADDRESS,
+                Place.Field.LOCATION
+        );
 
-        FetchPlaceRequest request = FetchPlaceRequest
-                .builder(placeId, placeFields)
-                .build();
-
-//        placesClient.fetchPlace(request)
-//                .addOnSuccessListener(response -> {
-//
-//                }).addOnFailureListener(e -> {
-//
-//                });
+        // todo: should call a function in viewModel here
     }
 
     /**

@@ -3,6 +3,7 @@ package com.reza.map.data.repository;
 import android.location.Location;
 
 import com.reza.location.LocationManager;
+import com.reza.places.PlacesManager;
 
 import javax.inject.Inject;
 
@@ -13,10 +14,12 @@ import io.reactivex.Single;
 public class DefaultLocationRepository implements LocationRepository {
 
     final LocationManager locationManager;
+    final PlacesManager placesManager; // todo add functionality for this manger into this repository
 
     @Inject
-    public DefaultLocationRepository(LocationManager locationManager) {
+    public DefaultLocationRepository(LocationManager locationManager, PlacesManager placesManager) {
         this.locationManager = locationManager;
+        this.placesManager = placesManager;
     }
 
     @Override
