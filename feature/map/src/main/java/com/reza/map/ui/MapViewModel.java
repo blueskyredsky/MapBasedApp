@@ -4,7 +4,10 @@ import android.location.Location;
 
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.libraries.places.api.model.Place;
 import com.reza.map.data.repository.LocationRepository;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -35,5 +38,9 @@ public class MapViewModel extends ViewModel {
 
     public Completable startLocationUpdates() {
         return locationRepository.startLocationUpdates();
+    }
+
+    public Single<Place> getPlace(String placeId, List<Place.Field> placeFields) {
+        return locationRepository.getPlace(placeId, placeFields);
     }
 }

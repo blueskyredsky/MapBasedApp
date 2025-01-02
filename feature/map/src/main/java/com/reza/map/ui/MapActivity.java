@@ -3,7 +3,6 @@ package com.reza.map.ui;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,8 +18,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.datatransport.cct.internal.LogEvent;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,12 +26,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.reza.common.viewmodel.ViewModelFactory;
-import com.reza.map.BuildConfig;
 import com.reza.map.R;
 import com.reza.map.data.di.MapComponent;
 import com.reza.map.data.di.MapComponentProvider;
@@ -111,9 +104,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         getCurrentLocation();
-        map.setOnPoiClickListener(pointOfInterest -> {
-            Toast.makeText(this, pointOfInterest.name, Toast.LENGTH_LONG).show();
-        });
+        map.setOnPoiClickListener(this::displayPoi);
     }
 
     private void displayPoi(PointOfInterest pointOfInterest) {
@@ -127,7 +118,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Place.Field.LOCATION
         );
 
-        // todo: should call a function in viewModel here
+        compositeDisposable.add(viewModel.getPlace(placeId, placeFields)
+                .subscribeOn(ioScheduler)
+                .observeOn(mainScheduler)
+                .subscribe(place -> {
+                    // todo show a temporary toast
+                    Toast.makeText(this, place.getDisplayName() + place.getInternationalPhoneNumber(), Toast.LENGTH_SHORT).show();
+                }, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
     /**

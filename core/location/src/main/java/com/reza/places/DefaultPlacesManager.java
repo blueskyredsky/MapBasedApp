@@ -37,12 +37,7 @@ public class DefaultPlacesManager implements PlacesManager {
     }
 
     @Override
-    public PlacesClient getPlacesClient() {
-        return placesClient;
-    }
-
-    @Override
-    public Single<Place> getPlaces(String placeId, List<Place.Field> placeFields) {
+    public Single<Place> getPlace(String placeId, List<Place.Field> placeFields) {
         return Single.create(emitter -> {
             FetchPlaceRequest request = FetchPlaceRequest
                     .builder(placeId, placeFields)
@@ -51,7 +46,6 @@ public class DefaultPlacesManager implements PlacesManager {
             placesClient.fetchPlace(request)
                     .addOnSuccessListener(response -> {
                         emitter.onSuccess(response.getPlace());
-                        // Toast.makeText(this, place.getDisplayName() + place.getInternationalPhoneNumber(), Toast.LENGTH_LONG).show();
                     }).addOnFailureListener(exception -> {
                         if (exception instanceof ApiException) {
                             emitter.onError(exception);
