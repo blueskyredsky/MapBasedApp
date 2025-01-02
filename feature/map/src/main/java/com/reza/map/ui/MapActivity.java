@@ -108,6 +108,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void displayPoi(PointOfInterest pointOfInterest) {
+        displayPoiGetPlaceStep(pointOfInterest);
+    }
+
+    private void displayPoiGetPlaceStep(PointOfInterest pointOfInterest) {
         String placeId = pointOfInterest.placeId;
         List<Place.Field> placeFields = List.of(
                 Place.Field.ID,
@@ -122,7 +126,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .subscribeOn(ioScheduler)
                 .observeOn(mainScheduler)
                 .subscribe(place -> {
-                    // todo show a temporary toast
                     Toast.makeText(this, place.getDisplayName() + place.getInternationalPhoneNumber(), Toast.LENGTH_SHORT).show();
                 }, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
