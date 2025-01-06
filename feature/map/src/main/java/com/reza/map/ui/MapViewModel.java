@@ -1,9 +1,11 @@
 package com.reza.map.ui;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.reza.map.data.repository.LocationRepository;
 
@@ -15,32 +17,36 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
-public class MapViewModel extends ViewModel {
+class MapViewModel extends ViewModel {
 
     final LocationRepository locationRepository;
 
     @Inject
-    public MapViewModel(LocationRepository locationRepository) {
+    MapViewModel(LocationRepository locationRepository) {
         this.locationRepository = locationRepository;
     }
 
-    public Single<Location> getLastLocation() {
+    Single<Location> getLastLocation() {
         return locationRepository.getLastLocation();
     }
 
-    public Flowable<Location> getLocationUpdates() {
+    Flowable<Location> getLocationUpdates() {
         return locationRepository.getLocationUpdates();
     }
 
-    public Completable stopLocationUpdates() {
+    Completable stopLocationUpdates() {
         return locationRepository.stopLocationUpdates();
     }
 
-    public Completable startLocationUpdates() {
+    Completable startLocationUpdates() {
         return locationRepository.startLocationUpdates();
     }
 
-    public Single<Place> getPlace(String placeId, List<Place.Field> placeFields) {
+    Single<Place> getPlace(String placeId, List<Place.Field> placeFields) {
         return locationRepository.getPlace(placeId, placeFields);
+    }
+
+    Single<Bitmap> getPhoto(PhotoMetadata photoMetadata, int maxWidth, int maxHeight) {
+        return locationRepository.getPhoto(photoMetadata, maxWidth, maxHeight);
     }
 }

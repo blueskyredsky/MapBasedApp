@@ -26,6 +26,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
@@ -125,19 +126,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         compositeDisposable.add(viewModel.getPlace(placeId, placeFields)
                 .subscribeOn(ioScheduler)
                 .observeOn(mainScheduler)
-                .subscribe(place -> {
-                    Toast.makeText(this, place.getDisplayName() + place.getInternationalPhoneNumber(), Toast.LENGTH_SHORT).show();
-                }, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(this::displayPoiGetPhotoStep, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    /**
-     * Checks and requests location permission if necessary.
-     * <p>
-     * This method verifies if the app has permission to access fine location.
-     * If permission is granted, it proceeds to display the current location on the map.
-     * If permission is not granted and the user should be shown a rationale, an educational dialog is displayed.
-     * Otherwise, the method directly requests the location permission.
-     */
+    private void displayPoiGetPhotoStep(Place place) {
+        if (place.getPhotoMetadatas() != null) {
+            PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+            compositeDisposable.add(viewModel.getPhoto(photoMetadata, 100, 100)
+                    .subscribeOn(ioScheduler)
+                    .observeOn(mainScheduler)
+                    .subscribe(bitmap -> {
+
+                    }, throwable -> {
+                    }));
+        } else {
+            // todo Next step here
+        }
+
+    }
+
     private void getCurrentLocation() {
         if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -162,12 +169,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    /**
-     * Subscribes to location updates and handles them.
-     * <p>
-     * This method subscribes to the location updates Flowable from the ViewModel and handles
-     * each location update. It displays a toast message if an error occurs.
-     */
     private void getLocationUpdates() {
         compositeDisposable.add(viewModel.getLocationUpdates()
                 .subscribeOn(ioScheduler)
@@ -178,13 +179,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         );
     }
 
-    /**
-     * Displays the current location on the map.
-     * <p>
-     * This method subscribes to the location updates Flowable from the ViewModel and displays
-     * the current location on the map by adding a marker and moving the camera.
-     * It displays a toast message if an error occurs.
-     */
     private void showCurrentLocationOnMap() {
         compositeDisposable.add(viewModel.getLocationUpdates()
                 .subscribeOn(ioScheduler)
@@ -196,32 +190,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    /**
-     * Adds a marker to the map at the specified location.
-     *
-     * @param latLng The LatLng of the marker.
-     */
     private void addMarkerToMap(LatLng latLng) {
         map.clear();
         map.addMarker(new MarkerOptions().position(latLng).title(getString(R.string.you_are_here)));
     }
 
-    /**
-     * Moves the camera to the specified location.
-     *
-     * @param latLng The LatLng to move the camera to.
-     */
     private void moveCameraToLocation(LatLng latLng) {
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng, 16.0f);
         map.moveCamera(update);
     }
 
-    /**
-     * Displays an educational dialog to the user explaining the need for location permission.
-     * <p>
-     * The dialog provides "Ok" and "Cancel" buttons for user interaction.
-     * If the user clicks "Ok", the permission request is launched.
-     */
     private void showEducationalDialogForLocationPermission() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.title_educational_dialog)

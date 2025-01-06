@@ -1,7 +1,9 @@
 package com.reza.map.data.repository;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.reza.location.LocationManager;
 import com.reza.places.PlacesManager;
@@ -48,5 +50,10 @@ public class DefaultLocationRepository implements LocationRepository {
     @Override
     public Single<Place> getPlace(String placeId, List<Place.Field> placeFields) {
         return placesManager.getPlace(placeId, placeFields);
+    }
+
+    @Override
+    public Single<Bitmap> getPhoto(PhotoMetadata photoMetadata, int maxWidth, int maxHeight) {
+        return placesManager.getPhoto(photoMetadata, maxWidth, maxHeight);
     }
 }
