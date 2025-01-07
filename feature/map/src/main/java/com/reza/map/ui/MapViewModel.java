@@ -17,7 +17,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
-class MapViewModel extends ViewModel {
+public class MapViewModel extends ViewModel {
 
     final LocationRepository locationRepository;
 

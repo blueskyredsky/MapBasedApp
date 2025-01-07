@@ -2,6 +2,7 @@ package com.reza.map.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -9,6 +10,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -23,6 +25,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
@@ -117,7 +121,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         List<Place.Field> placeFields = List.of(
                 Place.Field.ID,
                 Place.Field.DISPLAY_NAME,
-                Place.Field.INTERNATIONAL_PHONE_NUMBER,
+                Place.Field.PHONE_NUMBER,
                 Place.Field.PHOTO_METADATAS,
                 Place.Field.FORMATTED_ADDRESS,
                 Place.Field.LOCATION
@@ -132,17 +136,32 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void displayPoiGetPhotoStep(Place place) {
         if (place.getPhotoMetadatas() != null) {
             PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
-            compositeDisposable.add(viewModel.getPhoto(photoMetadata, 100, 100)
+            compositeDisposable.add(viewModel.getPhoto(photoMetadata,
+                            getResources().getDimensionPixelSize(com.reza.common.R.dimen.default_image_width),
+                            getResources().getDimensionPixelSize(com.reza.common.R.dimen.default_image_height))
                     .subscribeOn(ioScheduler)
                     .observeOn(mainScheduler)
-                    .subscribe(bitmap -> {
-
-                    }, throwable -> {
-                    }));
+                    .subscribe(bitmap -> displayPoiDisplayStep(place, bitmap),
+                            throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
         } else {
-            // todo Next step here
+            displayPoiDisplayStep(place, null);
         }
+    }
 
+    private void displayPoiDisplayStep(Place place, @Nullable Bitmap photo) {
+        BitmapDescriptor iconPhoto;
+        if (photo == null) {
+            iconPhoto = BitmapDescriptorFactory.defaultMarker();
+        } else {
+            iconPhoto = BitmapDescriptorFactory.fromBitmap(photo);
+        }
+        if (place.getLocation() != null) {
+            map.addMarker(new MarkerOptions()
+                    .position(place.getLocation())
+                    .icon(iconPhoto)
+                    .title(place.getDisplayName())
+                    .snippet(place.getPhoneNumber()));
+        }
     }
 
     private void getCurrentLocation() {
