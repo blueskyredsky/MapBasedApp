@@ -28,6 +28,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
@@ -36,6 +37,7 @@ import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
 import com.reza.map.data.di.MapComponent;
 import com.reza.map.data.di.MapComponentProvider;
+import com.reza.map.ui.adapter.BookmarkInfoWindowAdapter;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
@@ -108,6 +110,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
+        map.setInfoWindowAdapter(new BookmarkInfoWindowAdapter(this));
         getCurrentLocation();
         map.setOnPoiClickListener(this::displayPoi);
     }
@@ -121,7 +124,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         List<Place.Field> placeFields = List.of(
                 Place.Field.ID,
                 Place.Field.DISPLAY_NAME,
-                Place.Field.PHONE_NUMBER,
+                Place.Field.NATIONAL_PHONE_NUMBER,
                 Place.Field.PHOTO_METADATAS,
                 Place.Field.FORMATTED_ADDRESS,
                 Place.Field.LOCATION
@@ -155,12 +158,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         } else {
             iconPhoto = BitmapDescriptorFactory.fromBitmap(photo);
         }
+
         if (place.getLocation() != null) {
-            map.addMarker(new MarkerOptions()
+            /*Marker marker =*/ map.addMarker(new MarkerOptions()
                     .position(place.getLocation())
-                    .icon(iconPhoto)
                     .title(place.getDisplayName())
-                    .snippet(place.getPhoneNumber()));
+                    .snippet(place.getNationalPhoneNumber()));
+
+            /*if (marker != null) {
+                marker.setTag(iconPhoto);
+            }*/
         }
     }
 
