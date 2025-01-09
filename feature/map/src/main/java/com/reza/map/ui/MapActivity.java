@@ -110,9 +110,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
-        map.setInfoWindowAdapter(new BookmarkInfoWindowAdapter(this));
         getCurrentLocation();
         map.setOnPoiClickListener(this::displayPoi);
+        map.setInfoWindowAdapter(new BookmarkInfoWindowAdapter(this));
     }
 
     private void displayPoi(PointOfInterest pointOfInterest) {
@@ -124,7 +124,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         List<Place.Field> placeFields = List.of(
                 Place.Field.ID,
                 Place.Field.DISPLAY_NAME,
-                Place.Field.NATIONAL_PHONE_NUMBER,
+                Place.Field.PHONE_NUMBER,
                 Place.Field.PHOTO_METADATAS,
                 Place.Field.FORMATTED_ADDRESS,
                 Place.Field.LOCATION
@@ -160,14 +160,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         if (place.getLocation() != null) {
-            /*Marker marker =*/ map.addMarker(new MarkerOptions()
+            Marker marker = map.addMarker(new MarkerOptions()
                     .position(place.getLocation())
                     .title(place.getDisplayName())
-                    .snippet(place.getNationalPhoneNumber()));
+                    .snippet(place.getPhoneNumber()));
 
-            /*if (marker != null) {
-                marker.setTag(iconPhoto);
-            }*/
+            if (marker != null && photo != null) {
+                marker.setTag(photo);
+            }
         }
     }
 

@@ -2,6 +2,7 @@ package com.reza.map.ui.adapter;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -10,13 +11,14 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.Marker;
 import com.reza.map.databinding.ContentBookmarkInfoBinding;
 
+import java.util.Objects;
+
 public class BookmarkInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
-    private final Activity context;
+    private static final String TAG = "BookmarkInfoWindowAdapterTag";
     private final ContentBookmarkInfoBinding binding;
 
     public BookmarkInfoWindowAdapter(Activity context) {
-        this.context = context;
         binding = ContentBookmarkInfoBinding.inflate(LayoutInflater.from(context));
     }
 
@@ -31,14 +33,12 @@ public class BookmarkInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         String title = marker.getTitle();
         String snippet = marker.getSnippet();
 
-        // Handle potential ClassCastException for image
-        if (marker.getTag() instanceof Bitmap) {
+        try {
             binding.photo.setImageBitmap((Bitmap) marker.getTag());
-        } else if (marker.getTag() instanceof BitmapDescriptor) {
-            // Handle case where tag is a BitmapDescriptor (optional)
-            // You could log a warning or take no action here.
+        } catch (ClassCastException exception) {
+            // todo set a default image
+            Log.e(TAG, exception.getMessage() != null ? exception.getMessage() : "class cast exception");
         }
-
         binding.title.setText(title != null ? title : "");
         binding.phone.setText(snippet != null ? snippet : "");
 
