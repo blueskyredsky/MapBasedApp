@@ -19,6 +19,7 @@ rxandroid = "2.1.1"
 rxjava = "2.2.21"
 truth = "1.1.4"
 core = "1.5.0"
+room = "2.6.1"
 
 [libraries]
 adapter-rxjava = { module = "com.squareup.retrofit2:adapter-rxjava", version.ref = "retrofit" }
@@ -43,6 +44,9 @@ rxandroid = { module = "io.reactivex.rxjava2:rxandroid", version.ref = "rxandroi
 rxjava = { module = "io.reactivex.rxjava2:rxjava", version.ref = "rxjava" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 core = { group = "androidx.test", name = "core", version.ref = "core" }
+room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+annotation = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-rxjava = { group = "androidx.room", name = "room-rxjava2", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
