@@ -43,6 +43,7 @@ dependencies {
     implementation project(":core:location")
     implementation project(":core:threading")
     implementation project(":core:common")
+    implementation project(":core:database")
     testImplementation project(":core:test")
 
     implementation libs.appcompat

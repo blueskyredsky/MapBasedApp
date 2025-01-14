@@ -1,4 +1,4 @@
-package com.reza.database.entity;
+package com.reza.database;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -7,7 +7,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "bookmark")
-public class Bookmark {
+public class BookmarkEntity {
 
     @PrimaryKey(autoGenerate = true)
     @Nullable
@@ -32,7 +32,7 @@ public class Bookmark {
     @ColumnInfo(name = "phone")
     private final String phone;
 
-    public Bookmark(@Nullable Long id, @Nullable String placeId, String name, String address, double latitude, double longitude, String phone) {
+    public BookmarkEntity(@Nullable Long id, @Nullable String placeId, String name, String address, double latitude, double longitude, String phone) {
         this.id = id;
         this.placeId = placeId;
         this.name = name;
