@@ -22,6 +22,7 @@ dependencies {
     implementation project(":core:location")
     implementation project(":core:common")
     implementation project(":core:threading")
+    implementation project(":core:database")
 
     // map sdk
     implementation libs.play.services.maps

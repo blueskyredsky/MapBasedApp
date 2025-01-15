@@ -7,7 +7,8 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
-import com.reza.map.data.repository.LocationRepository;
+import com.reza.map.data.repository.location.LocationRepository;
+import com.reza.map.data.repository.place.PlaceRepository;
 
 import java.util.List;
 
@@ -19,11 +20,13 @@ import io.reactivex.Single;
 
 public class MapViewModel extends ViewModel {
 
-    final LocationRepository locationRepository;
+    private final LocationRepository locationRepository;
+    private final PlaceRepository placeRepository;
 
     @Inject
-    MapViewModel(LocationRepository locationRepository) {
+    MapViewModel(LocationRepository locationRepository, PlaceRepository placeRepository) {
         this.locationRepository = locationRepository;
+        this.placeRepository = placeRepository;
     }
 
     Single<Location> getLastLocation() {
@@ -43,10 +46,10 @@ public class MapViewModel extends ViewModel {
     }
 
     Single<Place> getPlace(String placeId, List<Place.Field> placeFields) {
-        return locationRepository.getPlace(placeId, placeFields);
+        return placeRepository.getPlace(placeId, placeFields);
     }
 
     Single<Bitmap> getPhoto(PhotoMetadata photoMetadata, int maxWidth, int maxHeight) {
-        return locationRepository.getPhoto(photoMetadata, maxWidth, maxHeight);
+        return placeRepository.getPhoto(photoMetadata, maxWidth, maxHeight);
     }
 }

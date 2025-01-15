@@ -19,16 +19,16 @@ import io.reactivex.Single;
 public interface BookmarkDao {
 
     @Query("SELECT * FROM bookmark")
-    Flowable<List<BookmarkEntity>> loadAllBookmarksFlowable();
+    Flowable<List<BookmarkEntity>> getAllBookmarks();
 
     @Query("SELECT * FROM bookmark WHERE id = :bookmarkId")
-    Single<BookmarkEntity> loadBookmarkSingle(Long bookmarkId);
+    Single<BookmarkEntity> getBookmark(Long bookmarkId);
 
     @Query("SELECT * FROM bookmark WHERE place_id = :placeId")
-    Single<BookmarkEntity> loadBookmarkSingle(String placeId);
+    Single<BookmarkEntity> getBookmark(String placeId);
 
     @Insert(onConflict = IGNORE)
-    Completable insertBookmark(BookmarkEntity bookmark);
+    Completable addBookmark(BookmarkEntity bookmark);
 
     @Update(onConflict = REPLACE)
     Completable updateBookmark(BookmarkEntity bookmark);
