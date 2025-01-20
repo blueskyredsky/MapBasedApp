@@ -42,6 +42,11 @@ public class BookmarkEntity {
         this.phone = phone;
     }
 
+    // Secondary constructor without id
+    public BookmarkEntity(String placeId, String name, String address, double latitude, double longitude, String phone) {
+        this(null, placeId, name, address, latitude, longitude, phone);
+    }
+
     @Nullable
     public Long getId() {
         return id;
