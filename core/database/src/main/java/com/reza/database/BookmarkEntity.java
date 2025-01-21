@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "bookmark")
@@ -43,6 +44,7 @@ public class BookmarkEntity {
     }
 
     // Secondary constructor without id
+    @Ignore
     public BookmarkEntity(String placeId, String name, String address, double latitude, double longitude, String phone) {
         this(null, placeId, name, address, latitude, longitude, phone);
     }

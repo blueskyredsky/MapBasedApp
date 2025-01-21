@@ -1,9 +1,12 @@
 package com.reza.map.ui;
 
+import static kotlinx.coroutines.flow.FlowKt.subscribeOn;
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -37,6 +40,7 @@ import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
 import com.reza.map.data.di.MapComponent;
 import com.reza.map.data.di.MapComponentProvider;
+import com.reza.map.data.model.PlaceInfo;
 import com.reza.map.ui.adapter.BookmarkInfoWindowAdapter;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
@@ -110,13 +114,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
+        setupMapListeners();
         getCurrentLocation();
-        map.setOnPoiClickListener(this::displayPoi);
+    }
+
+    private void setupMapListeners() {
         map.setInfoWindowAdapter(new BookmarkInfoWindowAdapter(this));
+        map.setOnPoiClickListener(this::displayPoi);
+        map.setOnInfoWindowClickListener(this::handleInfoWindowClick);
     }
 
     private void displayPoi(PointOfInterest pointOfInterest) {
         displayPoiGetPlaceStep(pointOfInterest);
+    }
+
+    private void handleInfoWindowClick(Marker marker) {
+        try {
+            PlaceInfo placeInfo = (PlaceInfo) marker.getTag();
+            if (placeInfo != null && placeInfo.getPlace() != null) {
+                compositeDisposable.add(viewModel.addBookmark(placeInfo.getPlace(), placeInfo.getPhoto())
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainScheduler)
+                        .subscribe());
+            }
+            marker.remove();
+        } catch (ClassCastException exception) {
+            Log.e(TAG, "handleInfoWindowClick: " + exception.getMessage());
+        }
     }
 
     private void displayPoiGetPlaceStep(PointOfInterest pointOfInterest) {
@@ -133,7 +157,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         compositeDisposable.add(viewModel.getPlace(placeId, placeFields)
                 .subscribeOn(ioScheduler)
                 .observeOn(mainScheduler)
-                .subscribe(this::displayPoiGetPhotoStep, throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(this::displayPoiGetPhotoStep,
+                        throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
     private void displayPoiGetPhotoStep(Place place) {
@@ -166,7 +191,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .snippet(place.getPhoneNumber()));
 
             if (marker != null && photo != null) {
-                marker.setTag(photo);
+                marker.setTag(new PlaceInfo(place, photo));
             }
         }
     }
