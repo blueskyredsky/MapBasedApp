@@ -116,6 +116,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map = googleMap;
         setupMapListeners();
         getCurrentLocation();
+        viewModel.getBookmarks();
     }
 
     private void setupMapListeners() {
@@ -289,5 +290,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
                         })
         );
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.dispose();
     }
 }

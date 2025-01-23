@@ -2,10 +2,11 @@ package com.reza.map.ui;
 
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -16,33 +17,48 @@ import com.reza.map.data.model.BookmarkMarker;
 import com.reza.map.data.repository.bookmark.BookmarkRepository;
 import com.reza.map.data.repository.location.LocationRepository;
 import com.reza.map.data.repository.place.PlaceRepository;
+import com.reza.threading.schedulers.IoScheduler;
+import com.reza.threading.schedulers.MainScheduler;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class MapViewModel extends ViewModel {
 
+    private static final String TAG = "MapViewModelTag";
     private final LocationRepository locationRepository;
     private final PlaceRepository placeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final CompositeDisposable compositeDisposable;
+    private final Scheduler ioScheduler;
+    private final Scheduler mainScheduler;
 
-    private LiveData<List<BookmarkMarker>> bookmarks = null;
+    private final MutableLiveData<List<BookmarkMarker>> _bookmarks = new MutableLiveData<>();
+    LiveData<List<BookmarkMarker>> bookmarks = _bookmarks;
 
     @Inject
-    MapViewModel(LocationRepository locationRepository, PlaceRepository placeRepository, BookmarkRepository bookmarkRepository, CompositeDisposable compositeDisposable) {
+    MapViewModel(LocationRepository locationRepository,
+                 PlaceRepository placeRepository,
+                 BookmarkRepository bookmarkRepository,
+                 CompositeDisposable compositeDisposable,
+                 @IoScheduler Scheduler ioScheduler,
+                 @MainScheduler Scheduler mainScheduler
+    ) {
         this.locationRepository = locationRepository;
         this.placeRepository = placeRepository;
         this.bookmarkRepository = bookmarkRepository;
         this.compositeDisposable = compositeDisposable;
+        this.ioScheduler = ioScheduler;
+        this.mainScheduler = mainScheduler;
     }
 
     Completable addBookmark(Place place, @Nullable Bitmap photo) {
@@ -60,22 +76,19 @@ public class MapViewModel extends ViewModel {
         return bookmarkRepository.addBookmark(bookmark);
     }
 
-    LiveData<List<BookmarkMarker>> getBookmarks() {
-        if (bookmarks == null) {
-            compositeDisposable.add(
-                    bookmarkRepository.getAllBookmarks()
-                            .map(bookmarkEntities ->
-
-                                    bookmarkEntities.stream().map(it -> {
-                                        return bookmarkEntityToBookmarkMarker(it);
-                                    }))
-                            .subscribe()
-
-
-            );
-
-        }
-        return bookmarks;
+    void getBookmarks() {
+        compositeDisposable.add(
+                bookmarkRepository.getAllBookmarks()
+                        .map(bookmarkEntities -> bookmarkEntities
+                                .stream()
+                                .map(this::bookmarkEntityToBookmarkMarker)
+                                .collect(Collectors.toList())
+                        )
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainScheduler)
+                        .subscribe(_bookmarks::setValue,
+                                throwable -> Log.e(TAG, "getBookmarks: " + throwable.getMessage()))
+        );
     }
 
     private BookmarkMarker bookmarkEntityToBookmarkMarker(BookmarkEntity bookmarkEntity) {
@@ -105,5 +118,11 @@ public class MapViewModel extends ViewModel {
 
     Single<Bitmap> getPhoto(PhotoMetadata photoMetadata, int maxWidth, int maxHeight) {
         return placeRepository.getPhoto(photoMetadata, maxWidth, maxHeight);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        compositeDisposable.clear();
     }
 }
