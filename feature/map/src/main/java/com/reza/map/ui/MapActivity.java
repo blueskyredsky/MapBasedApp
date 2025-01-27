@@ -40,6 +40,7 @@ import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
 import com.reza.map.data.di.MapComponent;
 import com.reza.map.data.di.MapComponentProvider;
+import com.reza.map.data.model.BookmarkMarker;
 import com.reza.map.data.model.PlaceInfo;
 import com.reza.map.ui.adapter.BookmarkInfoWindowAdapter;
 import com.reza.threading.schedulers.IoScheduler;
@@ -116,6 +117,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map = googleMap;
         setupMapListeners();
         getCurrentLocation();
+        createBookmarkMarkerObserver();
         viewModel.getBookmarks();
     }
 
@@ -195,6 +197,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 marker.setTag(new PlaceInfo(place, photo));
             }
         }
+    }
+
+    @Nullable
+    private Marker addPlaceMarker(@NonNull BookmarkMarker bookmarkMarker) {
+        Marker marker = map.addMarker(new MarkerOptions()
+                .position(bookmarkMarker.getLocation())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .title(bookmarkMarker.getTitle())
+                .snippet(bookmarkMarker.getPhoneNumber())
+                .alpha(0.8f));
+        if (marker != null) {
+            marker.setTag(bookmarkMarker);
+        }
+        return marker;
+    }
+
+    private void displayAllBookmarks(@NonNull List<BookmarkMarker> bookmarkMarkers) {
+        for (BookmarkMarker bookmarkMarker : bookmarkMarkers) {
+            addPlaceMarker(bookmarkMarker);
+        }
+    }
+
+    private void createBookmarkMarkerObserver() {
+        viewModel.bookmarks.observe(this, bookmarkMarkers -> {
+            map.clear();
+            displayAllBookmarks(bookmarkMarkers);
+        });
     }
 
     private void getCurrentLocation() {

@@ -6,13 +6,19 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class BookmarkMarker {
     @Nullable
-    private Long id;
+    private final Long id;
 
-    private LatLng location;
+    private final LatLng location;
 
-    public BookmarkMarker(@Nullable Long id, LatLng location) {
+    private final String title;
+
+    private final String phoneNumber;
+
+    public BookmarkMarker(@Nullable Long id, LatLng location, String title, String phoneNumber) {
         this.id = id;
         this.location = location;
+        this.title = title;
+        this.phoneNumber = phoneNumber;
     }
 
     @Nullable
@@ -24,11 +30,11 @@ public class BookmarkMarker {
         return location;
     }
 
-    public void setId(@Nullable Long id) {
-        this.id = id;
+    public String getTitle() {
+        return title;
     }
 
-    public void setLocation(LatLng location) {
-        this.location = location;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 }

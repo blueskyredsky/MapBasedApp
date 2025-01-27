@@ -93,7 +93,9 @@ public class MapViewModel extends ViewModel {
 
     private BookmarkMarker bookmarkEntityToBookmarkMarker(BookmarkEntity bookmarkEntity) {
         return new BookmarkMarker(bookmarkEntity.getId(),
-                new LatLng(bookmarkEntity.getLatitude(), bookmarkEntity.getLongitude()));
+                new LatLng(bookmarkEntity.getLatitude(), bookmarkEntity.getLongitude()),
+                bookmarkEntity.getName(),
+                bookmarkEntity.getPhone());
     }
 
     Single<Location> getLastLocation() {

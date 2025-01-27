@@ -19,6 +19,7 @@
             <option value="$PROJECT_DIR$/core/test" />
             <option value="$PROJECT_DIR$/core/threading" />
             <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/details" />
             <option value="$PROJECT_DIR$/feature/map" />
           </set>
         </option>
