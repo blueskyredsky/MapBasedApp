@@ -9,6 +9,7 @@ import android.view.View;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.Marker;
+import com.reza.map.data.model.BookmarkMarker;
 import com.reza.map.data.model.PlaceInfo;
 import com.reza.map.databinding.ContentBookmarkInfoBinding;
 
@@ -33,6 +34,18 @@ public class BookmarkInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     public View getInfoContents(Marker marker) {
         String title = marker.getTitle();
         String snippet = marker.getSnippet();
+
+        Object tag = marker.getTag();
+
+        if (tag instanceof PlaceInfo) {
+            PlaceInfo placeInfo = (PlaceInfo) tag;
+            if (placeInfo.getPhoto() != null) {
+                binding.photo.setImageBitmap(placeInfo.getPhoto());
+            }
+        } else if (tag instanceof BookmarkMarker) {
+            BookmarkMarker bookmark = (BookmarkMarker) tag;
+            // Set imageView bitmap for bookmarkView here
+        }
 
         try {
             PlaceInfo placeInfo = (PlaceInfo) marker.getTag();
