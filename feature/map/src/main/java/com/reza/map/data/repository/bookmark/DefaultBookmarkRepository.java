@@ -36,7 +36,7 @@ public class DefaultBookmarkRepository implements BookmarkRepository {
     }
 
     @Override
-    public Completable addBookmark(BookmarkEntity bookmark) {
+    public Single<Long> addBookmark(BookmarkEntity bookmark) {
         return bookmarkDao.addBookmark(bookmark);
     }
 

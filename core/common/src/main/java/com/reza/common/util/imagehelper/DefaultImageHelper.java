@@ -6,14 +6,16 @@ import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Completable;
+
 @Singleton
 public class DefaultImageHelper implements ImageHelper {
 
+    private static final String TAG = "DefaultImageHelperTAG";
     private final Context context;
 
     @Inject
@@ -21,32 +23,34 @@ public class DefaultImageHelper implements ImageHelper {
         this.context = context;
     }
 
-    private static final String TAG = "DefaultImageHelperTAG";
+    @Override
+    public Completable saveBitmapToFile(Bitmap image, String filename) {
+        return Completable.create(emitter -> {
+            try {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] bytes = stream.toByteArray();
+                saveBytesToFile(bytes, filename);
+                emitter.onComplete();
+            } catch (Exception e) {
+                emitter.onError(e);
+            }
+        });
+    }
 
     @Override
-    public void saveBitmapToFile(Bitmap bitmap, String filename) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] bytes = stream.toByteArray();
-        saveBytesToFile(bytes, filename);
+    public String generateImageFilename(Long bookmarkId) {
+        return "bookmark" + bookmarkId + ".png";
     }
 
     private void saveBytesToFile(byte[] bytes, String filename) {
-        FileOutputStream outputStream = null;
+        FileOutputStream outputStream;
         try {
             outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
             outputStream.write(bytes);
             outputStream.close();
         } catch (Exception e) {
             Log.e(TAG, "saveBytesToFile: " + e.getMessage());
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "saveBytesToFile: " + e.getMessage());
-                }
-            }
         }
     }
 }

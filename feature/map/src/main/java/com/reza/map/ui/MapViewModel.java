@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
+import com.reza.common.util.imagehelper.ImageHelper;
 import com.reza.database.BookmarkEntity;
 import com.reza.map.data.model.BookmarkMarker;
 import com.reza.map.data.repository.bookmark.BookmarkRepository;
@@ -39,6 +40,7 @@ public class MapViewModel extends ViewModel {
     private final PlaceRepository placeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final CompositeDisposable compositeDisposable;
+    private final ImageHelper imageHelper;
     private final Scheduler ioScheduler;
     private final Scheduler mainScheduler;
 
@@ -50,6 +52,7 @@ public class MapViewModel extends ViewModel {
                  PlaceRepository placeRepository,
                  BookmarkRepository bookmarkRepository,
                  CompositeDisposable compositeDisposable,
+                 ImageHelper imageHelper,
                  @IoScheduler Scheduler ioScheduler,
                  @MainScheduler Scheduler mainScheduler
     ) {
@@ -57,11 +60,12 @@ public class MapViewModel extends ViewModel {
         this.placeRepository = placeRepository;
         this.bookmarkRepository = bookmarkRepository;
         this.compositeDisposable = compositeDisposable;
+        this.imageHelper = imageHelper;
         this.ioScheduler = ioScheduler;
         this.mainScheduler = mainScheduler;
     }
 
-    Completable addBookmark(Place place, @Nullable Bitmap photo) {
+    Single<Long> addBookmark(Place place, @Nullable Bitmap photo) {
         Optional<LatLng> LatLngOptional = Optional.ofNullable(place.getLocation());
         double latitude = LatLngOptional.map(latLng -> latLng.latitude).orElse(0.0);
         double longitude = LatLngOptional.map(latLng -> latLng.longitude).orElse(0.0);
@@ -74,6 +78,15 @@ public class MapViewModel extends ViewModel {
                 place.getInternationalPhoneNumber());
 
         return bookmarkRepository.addBookmark(bookmark);
+    }
+
+    Completable saveImageToFile(@Nullable Bitmap photo, Long bookmarkId) {
+        if (photo != null) {
+            String filename = imageHelper.generateImageFilename(bookmarkId);
+            return imageHelper.saveBitmapToFile(photo, filename);
+        } else {
+            return Completable.complete(); // Complete without doing anything
+        }
     }
 
     void getBookmarks() {

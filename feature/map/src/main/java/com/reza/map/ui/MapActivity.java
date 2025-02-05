@@ -136,6 +136,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             PlaceInfo placeInfo = (PlaceInfo) marker.getTag();
             if (placeInfo != null && placeInfo.getPlace() != null) {
                 compositeDisposable.add(viewModel.addBookmark(placeInfo.getPlace(), placeInfo.getPhoto())
+                        .flatMapCompletable(bookmarkId -> viewModel.saveImageToFile(placeInfo.getPhoto(), bookmarkId))
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
                         .subscribe());

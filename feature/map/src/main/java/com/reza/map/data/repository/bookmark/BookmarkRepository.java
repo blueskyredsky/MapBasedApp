@@ -31,7 +31,7 @@ public interface BookmarkRepository {
     /**
      * Adds a new bookmark.
      */
-    Completable addBookmark(BookmarkEntity bookmark);
+    Single<Long> addBookmark(BookmarkEntity bookmark);
 
     /**
      * Updates an existing bookmark.

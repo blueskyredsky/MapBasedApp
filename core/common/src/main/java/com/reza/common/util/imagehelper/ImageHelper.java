@@ -1,7 +1,8 @@
 package com.reza.common.util.imagehelper;
 
-import android.content.Context;
 import android.graphics.Bitmap;
+
+import io.reactivex.Completable;
 
 /**
  * Interface for helping with image-related operations.
@@ -11,5 +12,10 @@ public interface ImageHelper {
     /**
      * Saves a Bitmap image to a file.
      */
-    void saveBitmapToFile(Bitmap image, String filename);
+    Completable saveBitmapToFile(Bitmap image, String filename);
+
+    /**
+     * Generates a unique filename for an image.
+     */
+    String generateImageFilename(Long bookmarkId);
 }

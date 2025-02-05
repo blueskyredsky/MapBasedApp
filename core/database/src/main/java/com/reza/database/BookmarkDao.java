@@ -28,7 +28,7 @@ public interface BookmarkDao {
     Single<BookmarkEntity> getBookmark(String placeId);
 
     @Insert(onConflict = IGNORE)
-    Completable addBookmark(BookmarkEntity bookmark);
+    Single<Long> addBookmark(BookmarkEntity bookmark);
 
     @Update(onConflict = REPLACE)
     Completable updateBookmark(BookmarkEntity bookmark);
