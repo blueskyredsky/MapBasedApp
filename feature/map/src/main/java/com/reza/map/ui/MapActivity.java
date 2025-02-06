@@ -1,8 +1,7 @@
 package com.reza.map.ui;
 
-import static kotlinx.coroutines.flow.FlowKt.subscribeOn;
-
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -82,8 +81,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     showCurrentLocationOnMap();
-                } else {
-                    showEducationalDialogForLocationPermission();
                 }
             });
 
@@ -196,6 +193,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             if (marker != null && photo != null) {
                 marker.setTag(new PlaceInfo(place, photo));
+                marker.showInfoWindow();
             }
         }
     }
@@ -232,9 +230,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
-//            showCurrentLocationOnMap();
+            showCurrentLocationOnMap();
 //            getLocationUpdates();
-            map.setMyLocationEnabled(true);
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             // In an educational UI, explain to the user why your app requires this
@@ -261,11 +258,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         );
     }
 
+    @SuppressLint("MissingPermission")
     private void showCurrentLocationOnMap() {
-        compositeDisposable.add(viewModel.getLocationUpdates()
+        compositeDisposable.add(viewModel.getLastLocation()
                 .subscribeOn(ioScheduler)
                 .observeOn(mainScheduler)
                 .subscribe(location -> {
+                    // the permission is already granted
+                    map.setMyLocationEnabled(true);
                     LatLng userCurrentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                     addMarkerToMap(userCurrentLatLng);
                     moveCameraToLocation(userCurrentLatLng);
