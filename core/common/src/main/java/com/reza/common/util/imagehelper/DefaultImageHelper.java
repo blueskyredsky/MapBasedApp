@@ -2,15 +2,18 @@ package com.reza.common.util.imagehelper;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 
 @Singleton
 public class DefaultImageHelper implements ImageHelper {
@@ -41,6 +44,23 @@ public class DefaultImageHelper implements ImageHelper {
     @Override
     public String generateImageFilename(Long bookmarkId) {
         return "bookmark" + bookmarkId + ".png";
+    }
+
+    @Override
+    public Maybe<Bitmap> loadBitmapFromFile(String filename) {
+        return Maybe.create(emitter -> {
+            try {
+                String filePath = new File(context.getFilesDir(), filename).getAbsolutePath();
+                Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+                if (bitmap != null) {
+                    emitter.onSuccess(bitmap);
+                } else {
+                    emitter.onError(new Exception("Failed to load bitmap from file: " + filename));
+                }
+            } catch (Exception exception) {
+                emitter.onError(exception);
+            }
+        });
     }
 
     private void saveBytesToFile(byte[] bytes, String filename) {

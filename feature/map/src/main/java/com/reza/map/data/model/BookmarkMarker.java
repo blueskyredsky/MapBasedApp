@@ -1,5 +1,7 @@
 package com.reza.map.data.model;
 
+import android.graphics.Bitmap;
+
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -14,11 +16,18 @@ public class BookmarkMarker {
 
     private final String phoneNumber;
 
-    public BookmarkMarker(@Nullable Long id, LatLng location, String title, String phoneNumber) {
+    private Bitmap image;
+
+    public BookmarkMarker(@Nullable Long id,
+                          LatLng location,
+                          String title,
+                          String phoneNumber,
+                          @Nullable Bitmap image) {
         this.id = id;
         this.location = location;
         this.title = title;
         this.phoneNumber = phoneNumber;
+        this.image = image;
     }
 
     @Nullable
@@ -36,5 +45,14 @@ public class BookmarkMarker {
 
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    @Nullable
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
     }
 }
