@@ -90,13 +90,38 @@ public class MapViewModel extends ViewModel {
     }
 
     void getBookmarks() {
-        compositeDisposable.add(
+        /*compositeDisposable.add(
                 bookmarkRepository.getAllBookmarks()
                         .map(bookmarkEntities -> bookmarkEntities
                                 .stream()
                                 .map(this::bookmarkEntityToBookmarkMarker)
                                 .collect(Collectors.toList())
                         )
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainScheduler)
+                        .subscribe(_bookmarks::setValue,
+                                throwable -> Log.e(TAG, "getBookmarks: " + throwable.getMessage()))
+        );*/
+
+        compositeDisposable.add(
+                bookmarkRepository.getAllBookmarks()
+                        .flatMap(bookmarkEntities -> Flowable.fromIterable(bookmarkEntities)
+                                .flatMap(bookmarkEntity -> {
+                                    BookmarkMarker bookmarkMarker = bookmarkEntityToBookmarkMarker(bookmarkEntity);
+                                    if (bookmarkMarker.getId() != null) {
+                                        return imageHelper.loadBitmapFromFile(imageHelper.generateImageFilename(bookmarkMarker.getId())) // Assuming getImagePath exists
+                                                .map(bitmap -> {
+                                                    bookmarkMarker.setImage(bitmap); // Set the bitmap to the BookmarkMarker
+                                                    return bookmarkMarker;
+                                                })
+                                                .defaultIfEmpty(bookmarkMarker) // Important: Handle cases where bitmap loading fails
+                                                .toFlowable(); // Convert Maybe back to Flowable
+                                    } else {
+                                        return Flowable.just(bookmarkMarker);
+                                    }
+                                }, 1) // Limit concurrency to 1 to avoid excessive bitmap loading
+                        )
+                        .toList()
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
                         .subscribe(_bookmarks::setValue,
