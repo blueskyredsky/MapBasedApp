@@ -21,6 +21,7 @@ import com.reza.map.data.repository.place.PlaceRepository;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -114,18 +115,33 @@ public class MapViewModel extends ViewModel {
                                                     bookmarkMarker.setImage(bitmap); // Set the bitmap to the BookmarkMarker
                                                     return bookmarkMarker;
                                                 })
+                                                .subscribeOn(ioScheduler)
                                                 .defaultIfEmpty(bookmarkMarker) // Important: Handle cases where bitmap loading fails
                                                 .toFlowable(); // Convert Maybe back to Flowable
                                     } else {
                                         return Flowable.just(bookmarkMarker);
                                     }
-                                }, 1) // Limit concurrency to 1 to avoid excessive bitmap loading
+                                }) // Limit concurrency to 1 to avoid excessive bitmap loading*/
                         )
-                        .toList()
+                        .map(bookmarkMarker -> {
+                            return bookmarkMarker;
+                        })
+                        // .toList()
+                        .map(bookmarkMarkers -> {
+                            return bookmarkMarkers;
+                        })
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
-                        .subscribe(_bookmarks::setValue,
-                                throwable -> Log.e(TAG, "getBookmarks: " + throwable.getMessage()))
+                        .subscribe(value -> {
+                                    ArrayList<BookmarkMarker> bookmarkMarkers = new ArrayList<>();
+                                    bookmarkMarkers.add(value);
+                                    _bookmarks.setValue(bookmarkMarkers);
+                                },
+                                throwable -> {
+                                    Log.e(TAG, "getBookmarks: " + throwable.getMessage());
+                                    _bookmarks.setValue(new ArrayList<>());
+                                }
+                        )
         );
     }
 
