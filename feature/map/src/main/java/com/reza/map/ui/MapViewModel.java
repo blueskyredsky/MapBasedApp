@@ -24,6 +24,7 @@ import com.reza.threading.schedulers.MainScheduler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -106,6 +107,7 @@ public class MapViewModel extends ViewModel {
 
         compositeDisposable.add(
                 bookmarkRepository.getAllBookmarks()
+                        .subscribeOn(ioScheduler)
                         .flatMap(bookmarkEntities -> Flowable.fromIterable(bookmarkEntities)
                                 .flatMap(bookmarkEntity -> {
                                     BookmarkMarker bookmarkMarker = bookmarkEntityToBookmarkMarker(bookmarkEntity);
@@ -116,29 +118,28 @@ public class MapViewModel extends ViewModel {
                                                     return bookmarkMarker;
                                                 })
                                                 .subscribeOn(ioScheduler)
-                                                .defaultIfEmpty(bookmarkMarker) // Important: Handle cases where bitmap loading fails
-                                                .toFlowable(); // Convert Maybe back to Flowable
+                                                .onErrorReturnItem(bookmarkMarker)
+                                                .toFlowable();
                                     } else {
                                         return Flowable.just(bookmarkMarker);
                                     }
-                                }) // Limit concurrency to 1 to avoid excessive bitmap loading*/
+                                })
                         )
-                        .map(bookmarkMarker -> {
-                            return bookmarkMarker;
-                        })
-                        // .toList()
-                        .map(bookmarkMarkers -> {
-                            return bookmarkMarkers;
-                        })
-                        .subscribeOn(ioScheduler)
+                        .doOnNext(bookmarkMarker -> Log.d(TAG, "FlatMap emitted: " + bookmarkMarker.getTitle()))
+                        .doOnError(throwable -> Log.e(TAG, "FlatMap error: " + throwable.getMessage()))
+                        .doOnComplete(() -> Log.d(TAG, "FlatMap completed"))
+                        .toList()
+                        .doOnError(throwable -> Log.e(TAG, "ToList error: " + throwable.getMessage()))
+                        .doOnSuccess(list -> Log.d(TAG, "ToList emitted: " + list.size()))
                         .observeOn(mainScheduler)
                         .subscribe(value -> {
-                                    ArrayList<BookmarkMarker> bookmarkMarkers = new ArrayList<>();
-                                    bookmarkMarkers.add(value);
-                                    _bookmarks.setValue(bookmarkMarkers);
+                                    _bookmarks.setValue(value);
+//                            ArrayList<BookmarkMarker> list = new ArrayList();
+//                            list.add(value);
+//                                    _bookmarks.setValue(list);
                                 },
                                 throwable -> {
-                                    Log.e(TAG, "getBookmarks: " + throwable.getMessage());
+                                    Log.e(TAG, "getBookmarks ERROR: " + throwable.getMessage(), throwable); // Print the full stack trace
                                     _bookmarks.setValue(new ArrayList<>());
                                 }
                         )
