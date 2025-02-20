@@ -107,52 +107,37 @@ public class MapViewModel extends ViewModel {
         );*/
 
         compositeDisposable.add(
-                /*bookmarkRepository.getAllBookmarks()*/
-                Flowable.just(Arrays.asList(new BookmarkEntity(1L, "id","name", "address", 1.0, 2.0, "phone")))
+                bookmarkRepository.getAllBookmarks()
                         .flatMap(bookmarkEntities -> Flowable.fromIterable(bookmarkEntities)
-                                .doOnNext(bookmarkEntity -> Log.d(TAG, "Processing bookmarkEntity: " + bookmarkEntity.getName()))
                                 .flatMap(bookmarkEntity -> {
                                     try {
                                         BookmarkMarker bookmarkMarker = bookmarkEntityToBookmarkMarker(bookmarkEntity);
                                         if (bookmarkMarker.getId() != null) {
-                                            /*return imageHelper.loadBitmapFromFile(imageHelper.generateImageFilename(bookmarkMarker.getId()))
+                                            return imageHelper.loadBitmapFromFile(imageHelper.generateImageFilename(bookmarkMarker.getId()))
+                                                    .subscribeOn(ioScheduler)
                                                     .map(bitmap -> {
                                                         bookmarkMarker.setImage(bitmap);
                                                         return bookmarkMarker;
                                                     })
-                                                    .subscribeOn(ioScheduler)
                                                     .onErrorReturnItem(bookmarkMarker)
-                                                    .toFlowable();*/
-                                            return Flowable.just(bookmarkMarker);
+                                                    .toFlowable();
                                         } else {
                                             return Flowable.just(bookmarkMarker);
                                         }
                                     } catch (Exception e) {
-                                        Log.e(TAG, "Error in bookmarkEntityToBookmarkMarker: " + e.getMessage(), e);
-                                        return Flowable.error(e);
+                                        Log.e(TAG, "Error in loadBitmapFromFile: " + e.getMessage());
+                                        return Flowable.empty();
                                     }
                                 })
-                                .timeout(5, TimeUnit.SECONDS)
-                                .doOnNext(bookmarkMarker -> Log.d(TAG, "FlatMap inner emitted: " + bookmarkMarker.getTitle()))
-                                .doOnComplete(() -> Log.d(TAG, "FlatMap inner completed"))
                         )
-                        .doOnNext(bookmarkMarker -> Log.d(TAG, "FlatMap outer emitted: " + bookmarkMarker.getTitle()))
-                        .doOnError(throwable -> Log.e(TAG, "FlatMap error: " + throwable.getMessage()))
-                        .doOnComplete(() -> Log.d(TAG, "FlatMap outer completed"))
+                        .scan(new ArrayList<BookmarkMarker>(), (accumulator, bookmarkMarker) -> {
+                            accumulator.add(bookmarkMarker);
+                            return accumulator;
+                        })
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
-                        .subscribe(bookmarkMarker -> {
-                                    if (_bookmarks.getValue() == null) {
-                                        ArrayList<BookmarkMarker> list = new ArrayList<>();
-                                        list.add(bookmarkMarker);
-                                        _bookmarks.setValue(list);
-                                    } else {
-                                        _bookmarks.getValue().add(bookmarkMarker);
-                                        _bookmarks.setValue(_bookmarks.getValue());
-                                    }
-                                },
-                                throwable -> {
-                                    Log.e(TAG, "getBookmarks ERROR: " + throwable.getMessage(), throwable); // Print the full stack trace
+                        .subscribe(_bookmarks::setValue, throwable -> {
+                                    Log.e(TAG, "getBookmarks ERROR: " + throwable.getMessage(), throwable);
                                     _bookmarks.setValue(new ArrayList<>());
                                 }
                         )
