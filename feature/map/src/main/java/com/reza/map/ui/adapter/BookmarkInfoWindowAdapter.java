@@ -49,16 +49,6 @@ public class BookmarkInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             Log.e(TAG, "getInfoContents: unable to handle type");
         }
 
-//        try {
-//            PlaceInfo placeInfo = (PlaceInfo) marker.getTag();
-//            if (placeInfo != null && placeInfo.getPhoto() != null) {
-//                binding.photo.setImageBitmap(placeInfo.getPhoto());
-//            }
-//
-//        } catch (ClassCastException exception) {
-//            // todo set a default image
-//            Log.e(TAG, exception.getMessage() != null ? exception.getMessage() : "class cast exception");
-//        }
         binding.title.setText(title != null ? title : "");
         binding.phone.setText(snippet != null ? snippet : "");
 
