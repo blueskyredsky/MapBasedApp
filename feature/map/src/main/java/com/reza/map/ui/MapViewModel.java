@@ -112,7 +112,7 @@ public class MapViewModel extends ViewModel {
                                 .flatMap(bookmarkEntity -> {
                                     try {
                                         BookmarkMarker bookmarkMarker = bookmarkEntityToBookmarkMarker(bookmarkEntity);
-                                        if (bookmarkMarker.getId() != null) {
+                                        if (bookmarkMarker.getId() != null) { // fixme a better approach could be calling [bookmarkMarker.setImage(bitmap)] on demand
                                             return imageHelper.loadBitmapFromFile(imageHelper.generateImageFilename(bookmarkMarker.getId()))
                                                     .subscribeOn(ioScheduler)
                                                     .map(bitmap -> {

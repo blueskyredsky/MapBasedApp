@@ -44,19 +44,21 @@ public class BookmarkInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             }
         } else if (tag instanceof BookmarkMarker) {
             BookmarkMarker bookmark = (BookmarkMarker) tag;
-            // Set imageView bitmap for bookmarkView here
+            binding.photo.setImageBitmap(bookmark.getImage());
+        } else {
+            Log.e(TAG, "getInfoContents: unable to handle type");
         }
 
-        try {
-            PlaceInfo placeInfo = (PlaceInfo) marker.getTag();
-            if (placeInfo != null && placeInfo.getPhoto() != null) {
-                binding.photo.setImageBitmap(placeInfo.getPhoto());
-            }
-
-        } catch (ClassCastException exception) {
-            // todo set a default image
-            Log.e(TAG, exception.getMessage() != null ? exception.getMessage() : "class cast exception");
-        }
+//        try {
+//            PlaceInfo placeInfo = (PlaceInfo) marker.getTag();
+//            if (placeInfo != null && placeInfo.getPhoto() != null) {
+//                binding.photo.setImageBitmap(placeInfo.getPhoto());
+//            }
+//
+//        } catch (ClassCastException exception) {
+//            // todo set a default image
+//            Log.e(TAG, exception.getMessage() != null ? exception.getMessage() : "class cast exception");
+//        }
         binding.title.setText(title != null ? title : "");
         binding.phone.setText(snippet != null ? snippet : "");
 
