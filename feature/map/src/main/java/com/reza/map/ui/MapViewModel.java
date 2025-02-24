@@ -130,12 +130,12 @@ public class MapViewModel extends ViewModel {
                                     }
                                 })
                         )
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainScheduler)
                         .scan(new ArrayList<BookmarkMarker>(), (accumulator, bookmarkMarker) -> {
                             accumulator.add(bookmarkMarker);
                             return accumulator;
                         })
-                        .subscribeOn(ioScheduler)
-                        .observeOn(mainScheduler)
                         .subscribe(_bookmarks::setValue, throwable -> {
                                     Log.e(TAG, "getBookmarks ERROR: " + throwable.getMessage(), throwable);
                                     _bookmarks.setValue(new ArrayList<>());
