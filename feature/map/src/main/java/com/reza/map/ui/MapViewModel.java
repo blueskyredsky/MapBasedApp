@@ -22,10 +22,8 @@ import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -93,7 +91,7 @@ public class MapViewModel extends ViewModel {
     }
 
     void getBookmarks() {
-        /*compositeDisposable.add(
+        compositeDisposable.add(
                 bookmarkRepository.getAllBookmarks()
                         .map(bookmarkEntities -> bookmarkEntities
                                 .stream()
@@ -104,9 +102,9 @@ public class MapViewModel extends ViewModel {
                         .observeOn(mainScheduler)
                         .subscribe(_bookmarks::setValue,
                                 throwable -> Log.e(TAG, "getBookmarks: " + throwable.getMessage()))
-        );*/
+        );
 
-        compositeDisposable.add(
+        /*compositeDisposable.add(
                 bookmarkRepository.getAllBookmarks()
                         .flatMap(bookmarkEntities -> Flowable.fromIterable(bookmarkEntities)
                                 .flatMap(bookmarkEntity -> {
@@ -141,6 +139,19 @@ public class MapViewModel extends ViewModel {
                                     _bookmarks.setValue(new ArrayList<>());
                                 }
                         )
+        );*/
+    }
+
+    void loadBookmarkImage(Long bookmarkId, BookmarkMarker bookmarkMarker) {
+        compositeDisposable.add(
+                imageHelper.loadBitmapFromFile(imageHelper.generateImageFilename(bookmarkId))
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainScheduler)
+                        .map(bitmap -> {
+                            bookmarkMarker.setImage(bitmap);
+                            return bookmarkMarker;
+                        })
+                        .subscribe()
         );
     }
 

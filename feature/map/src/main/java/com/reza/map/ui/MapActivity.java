@@ -122,6 +122,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.setInfoWindowAdapter(new BookmarkInfoWindowAdapter(this));
         map.setOnPoiClickListener(this::displayPoi);
         map.setOnInfoWindowClickListener(this::handleInfoWindowClick);
+        map.setOnMarkerClickListener(this::handleOnMarkerClickListener);
+    }
+
+    private boolean handleOnMarkerClickListener(Marker marker) {
+        // fixme this is a place to get image on demand
+        Object tag = marker.getTag();
+        if (tag instanceof BookmarkMarker) {
+            BookmarkMarker bookmark = (BookmarkMarker) tag;
+            viewModel.loadBookmarkImage(bookmark.getId(), bookmark);
+            marker.showInfoWindow();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void displayPoi(PointOfInterest pointOfInterest) {
@@ -205,7 +219,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                 .title(bookmarkMarker.getTitle())
                 .snippet(bookmarkMarker.getPhoneNumber())
-                .alpha(0.8f));
+                .alpha(0.8f)
+        );
         if (marker != null) {
             marker.setTag(bookmarkMarker);
         }
