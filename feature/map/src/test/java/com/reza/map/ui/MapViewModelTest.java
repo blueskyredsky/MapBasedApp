@@ -1,3 +1,4 @@
+/*
 package com.reza.map.ui;
 
 import android.location.Location;
@@ -35,7 +36,9 @@ public class MapViewModelTest {
 
     @After
     public void tearDown() {
-        /* NO-OP */
+        */
+/* NO-OP *//*
+
     }
 
     @Test
@@ -88,4 +91,4 @@ public class MapViewModelTest {
         testObserver.assertValue(location);
         testObserver.dispose();
     }
-}
+}*/

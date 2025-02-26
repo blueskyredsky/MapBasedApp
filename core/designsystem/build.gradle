@@ -1,11 +1,13 @@
-apply plugin: 'com.android.library'
+plugins {
+    alias(libs.plugins.android.library)
+}
 
 android {
-    compileSdk 35
+    namespace 'com.reza.designsystem'
+    compileSdk 34
 
     defaultConfig {
         minSdk 24
-        targetSdk 35
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -17,11 +19,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
-    buildFeatures {
-        viewBinding true
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -32,26 +29,7 @@ dependencies {
 
     implementation libs.appcompat
     implementation libs.material
-
-    // dagger 2
-    implementation libs.dagger
-    annotationProcessor libs.dagger.compiler
-
-    // RxJava
-    implementation libs.rxjava
-    implementation libs.rxandroid
-
-    // lifecycle
-    implementation libs.lifecycle.extensions
-
-    // unit tests
     testImplementation libs.junit
-    testImplementation libs.mockito.core
-    testImplementation libs.truth
-    testImplementation libs.robolectric
-    testImplementation libs.core
-
-    // ui tests
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 }
