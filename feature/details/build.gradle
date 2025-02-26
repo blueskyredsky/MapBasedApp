@@ -9,4 +9,8 @@ dependencies {
     implementation project(":core:common")
     implementation project(":core:threading")
     implementation project(":core:designsystem")
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
 }
