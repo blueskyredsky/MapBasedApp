@@ -104,13 +104,14 @@ public class MapViewModel extends ViewModel {
                                 throwable -> Log.e(TAG, "getBookmarks: " + throwable.getMessage()))
         );
 
+        // a better approach is to call this function [bookmarkMarker.setImage(bitmap);] on demand
         /*compositeDisposable.add(
                 bookmarkRepository.getAllBookmarks()
                         .flatMap(bookmarkEntities -> Flowable.fromIterable(bookmarkEntities)
                                 .flatMap(bookmarkEntity -> {
                                     try {
                                         BookmarkMarker bookmarkMarker = bookmarkEntityToBookmarkMarker(bookmarkEntity);
-                                        if (bookmarkMarker.getId() != null) { // fixme a better approach could be calling [bookmarkMarker.setImage(bitmap)] on demand
+                                        if (bookmarkMarker.getId() != null) {
                                             return imageHelper.loadBitmapFromFile(imageHelper.generateImageFilename(bookmarkMarker.getId()))
                                                     .subscribeOn(ioScheduler)
                                                     .map(bitmap -> {
@@ -142,17 +143,13 @@ public class MapViewModel extends ViewModel {
         );*/
     }
 
-    void loadBookmarkImage(Long bookmarkId, BookmarkMarker bookmarkMarker) {
-        compositeDisposable.add(
-                imageHelper.loadBitmapFromFile(imageHelper.generateImageFilename(bookmarkId))
-                        .subscribeOn(ioScheduler)
-                        .observeOn(mainScheduler)
-                        .map(bitmap -> {
-                            bookmarkMarker.setImage(bitmap);
-                            return bookmarkMarker;
-                        })
-                        .subscribe()
-        );
+    Completable loadBookmarkImage(Long bookmarkId, BookmarkMarker bookmarkMarker) {
+        return imageHelper.loadBitmapFromFile(imageHelper.generateImageFilename(bookmarkId))
+                .subscribeOn(ioScheduler)
+                .observeOn(mainScheduler)
+                .flatMapCompletable(bitmap ->
+                        Completable.fromAction(() -> bookmarkMarker.setImage(bitmap))
+                );
     }
 
     private BookmarkMarker bookmarkEntityToBookmarkMarker(BookmarkEntity bookmarkEntity) {

@@ -49,6 +49,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -126,12 +127,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private boolean handleOnMarkerClickListener(Marker marker) {
-        // fixme this is a place to get image on demand
         Object tag = marker.getTag();
         if (tag instanceof BookmarkMarker) {
             BookmarkMarker bookmark = (BookmarkMarker) tag;
-            viewModel.loadBookmarkImage(bookmark.getId(), bookmark);
-            marker.showInfoWindow();
+            compositeDisposable.add(
+                    viewModel.loadBookmarkImage(bookmark.getId(), bookmark)
+                            .andThen(Completable.fromAction(marker::showInfoWindow))
+                            .subscribe()
+            );
             return true;
         } else {
             return false;
