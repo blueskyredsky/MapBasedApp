@@ -1,4 +1,4 @@
-package com.reza.map.data.di;
+package com.reza.map.di;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;

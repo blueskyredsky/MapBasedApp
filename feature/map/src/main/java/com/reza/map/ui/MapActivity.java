@@ -35,10 +35,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
+import com.reza.common.navigator.ActivityNavigator;
 import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
-import com.reza.map.data.di.MapComponent;
-import com.reza.map.data.di.MapComponentProvider;
+import com.reza.map.di.MapComponent;
+import com.reza.map.di.MapComponentProvider;
 import com.reza.map.data.model.BookmarkMarker;
 import com.reza.map.data.model.PlaceInfo;
 import com.reza.map.ui.adapter.BookmarkInfoWindowAdapter;
@@ -70,6 +71,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @MainScheduler
     @Inject
     Scheduler mainScheduler;
+
+    @Inject
+    ActivityNavigator activityNavigator;
+    // to navigate this
+    // Intent intent = navigator.createTargetIntent(this, "some data")
+    // startActivity(intent)
 
     private MapViewModel viewModel;
 

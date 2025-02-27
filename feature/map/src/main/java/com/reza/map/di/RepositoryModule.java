@@ -1,4 +1,4 @@
-package com.reza.map.data.di;
+package com.reza.map.di;
 
 import com.reza.map.data.repository.bookmark.BookmarkRepository;
 import com.reza.map.data.repository.bookmark.DefaultBookmarkRepository;

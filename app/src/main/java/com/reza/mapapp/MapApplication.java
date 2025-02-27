@@ -2,8 +2,8 @@ package com.reza.mapapp;
 
 import android.app.Application;
 
-import com.reza.map.data.di.MapComponent;
-import com.reza.map.data.di.MapComponentProvider;
+import com.reza.map.di.MapComponent;
+import com.reza.map.di.MapComponentProvider;
 import com.reza.mapapp.di.ApplicationComponent;
 import com.reza.mapapp.di.DaggerApplicationComponent;
 

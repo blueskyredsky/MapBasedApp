@@ -9,7 +9,7 @@ import com.reza.database.PlaceBookDatabase;
 import com.reza.di.DatabaseModule;
 import com.reza.di.LocationModule;
 import com.reza.di.PlacesModule;
-import com.reza.map.data.di.MapComponent;
+import com.reza.map.di.MapComponent;
 import com.reza.threading.di.ThreadingModule;
 
 import javax.inject.Singleton;

@@ -1,4 +1,4 @@
-package com.reza.map.data.di;
+package com.reza.map.di;
 
 import com.reza.common.di.scope.ActivityScope;
 import com.reza.map.ui.MapActivity;

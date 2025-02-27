@@ -1,1 +1,8 @@
-<resources></resources>
+<resources>
+    <string name="name">Name</string>
+    <string name="address">Address</string>
+    <string name="phone">Phone</string>
+    <string name="phone_number">Phone number</string>
+    <string name="notes">Notes</string>
+    <string name="enter_notes">Enter notes</string>
+</resources>

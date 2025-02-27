@@ -1,6 +1,6 @@
 package com.reza.mapapp.di;
 
-import com.reza.map.data.di.MapComponent;
+import com.reza.map.di.MapComponent;
 
 import dagger.Module;
 
