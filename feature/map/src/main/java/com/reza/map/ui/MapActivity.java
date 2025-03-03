@@ -2,6 +2,7 @@ package com.reza.map.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -74,9 +75,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Inject
     ActivityNavigator activityNavigator;
-    // to navigate this
-    // Intent intent = navigator.createTargetIntent(this, "some data")
-    // startActivity(intent)
 
     private MapViewModel viewModel;
 
@@ -91,6 +89,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     showCurrentLocationOnMap();
                 }
             });
+
+    private void startBookmarkDetailsActivity(Long bookmarkId) {
+        Intent intent = activityNavigator.createTargetIntent(this, String.valueOf(bookmarkId));
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,9 +156,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void handleInfoWindowClick(Marker marker) {
-        try {
-            PlaceInfo placeInfo = (PlaceInfo) marker.getTag();
-            if (placeInfo != null && placeInfo.getPlace() != null) {
+        Object tag = marker.getTag();
+        if (tag instanceof PlaceInfo) {
+            PlaceInfo placeInfo = (PlaceInfo) tag;
+            if (placeInfo.getPlace() != null) {
                 compositeDisposable.add(viewModel.addBookmark(placeInfo.getPlace(), placeInfo.getPhoto())
                         .flatMapCompletable(bookmarkId -> viewModel.saveImageToFile(placeInfo.getPhoto(), bookmarkId))
                         .subscribeOn(ioScheduler)
@@ -163,8 +167,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         .subscribe());
             }
             marker.remove();
-        } catch (ClassCastException exception) {
-            Log.e(TAG, "handleInfoWindowClick: " + exception.getMessage());
+        } else if (tag instanceof BookmarkMarker) {
+            BookmarkMarker bookmark = (BookmarkMarker) tag;
+            marker.hideInfoWindow();
+            startBookmarkDetailsActivity(bookmark.getId());
+        } else {
+            Log.e(TAG, "getInfoContents: unable to handle type");
         }
     }
 

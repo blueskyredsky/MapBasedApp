@@ -6,6 +6,7 @@ import com.reza.common.di.CommonModule;
 import com.reza.common.di.ViewModelModule;
 import com.reza.database.BookmarkDao;
 import com.reza.database.PlaceBookDatabase;
+import com.reza.details.di.DetailsComponent;
 import com.reza.di.DatabaseModule;
 import com.reza.di.LocationModule;
 import com.reza.di.PlacesModule;
@@ -41,4 +42,6 @@ public interface ApplicationComponent {
     BookmarkDao provideBookmarkDao();
 
     MapComponent.Factory mapComponent();
+
+    DetailsComponent.Factory detailsComponent();
 }

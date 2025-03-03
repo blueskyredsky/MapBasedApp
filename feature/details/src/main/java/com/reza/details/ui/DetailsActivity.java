@@ -9,6 +9,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.reza.details.databinding.ActivityDetailsBinding;
+import com.reza.details.di.DetailsComponent;
+import com.reza.details.di.DetailsComponentProvider;
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -16,6 +18,10 @@ public class DetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // providing mapComponent
+        DetailsComponent detailsComponent = ((DetailsComponentProvider) getApplicationContext()).provideDetailsComponent();
+        detailsComponent.inject(this);
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         binding = ActivityDetailsBinding.inflate(getLayoutInflater());
@@ -30,10 +36,7 @@ public class DetailsActivity extends AppCompatActivity {
         setupToolbar();
     }
 
-
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
     }
-
-
 }

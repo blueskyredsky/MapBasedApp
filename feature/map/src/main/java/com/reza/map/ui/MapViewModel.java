@@ -21,7 +21,6 @@ import com.reza.map.data.repository.place.PlaceRepository;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
