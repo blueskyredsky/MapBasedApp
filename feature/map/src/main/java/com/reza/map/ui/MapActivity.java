@@ -36,13 +36,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
-import com.reza.common.navigator.ActivityNavigator;
+import com.reza.common.util.intent.IntentConstants;
 import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
-import com.reza.map.di.MapComponent;
-import com.reza.map.di.MapComponentProvider;
 import com.reza.map.data.model.BookmarkMarker;
 import com.reza.map.data.model.PlaceInfo;
+import com.reza.map.di.MapComponent;
+import com.reza.map.di.MapComponentProvider;
 import com.reza.map.ui.adapter.BookmarkInfoWindowAdapter;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
@@ -73,9 +73,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Inject
     Scheduler mainScheduler;
 
-    @Inject
-    ActivityNavigator activityNavigator;
-
     private MapViewModel viewModel;
 
     private GoogleMap map;
@@ -91,7 +88,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             });
 
     private void startBookmarkDetailsActivity(Long bookmarkId) {
-        Intent intent = activityNavigator.createTargetIntent(this, String.valueOf(bookmarkId));
+        Intent intent = new Intent(IntentConstants.ACTION_OPEN_DETAILS);
+        intent.putExtra(IntentConstants.EXTRA_BOOKMARK_ID, bookmarkId);
         startActivity(intent);
     }
 

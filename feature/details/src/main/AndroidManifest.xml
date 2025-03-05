@@ -5,9 +5,15 @@
 
         <activity
             android:name=".ui.DetailsActivity"
+            android:exported="true"
             android:label="details"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <action android:name="com.reza.details.ACTION_OPEN_TARGET" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

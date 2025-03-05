@@ -6,7 +6,7 @@ import com.reza.details.ui.DetailsActivity;
 import dagger.Subcomponent;
 
 @ActivityScope
-@Subcomponent(modules = {DetailsViewModelModule.class, DetailsNavigatorModule.class})
+@Subcomponent(modules = {DetailsViewModelModule.class})
 public interface DetailsComponent {
 
     // Factory that is used to create instances of this subcomponent
