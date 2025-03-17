@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.reza.common.di.CommonModule;
 import com.reza.common.di.ViewModelModule;
+import com.reza.data.di.DataModule;
 import com.reza.database.BookmarkDao;
 import com.reza.database.PlaceBookDatabase;
 import com.reza.details.di.DetailsComponent;
@@ -26,7 +27,8 @@ import dagger.Component;
         CommonModule.class,
         ViewModelModule.class,
         SubComponentModule.class,
-        DatabaseModule.class
+        DatabaseModule.class,
+        DataModule.class
 })
 public interface ApplicationComponent {
 

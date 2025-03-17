@@ -45,6 +45,7 @@ dependencies {
     implementation project(":core:threading")
     implementation project(":core:common")
     implementation project(":core:database")
+    implementation project(":core:data")
     implementation project(":core:designsystem")
     testImplementation project(":core:test")
 

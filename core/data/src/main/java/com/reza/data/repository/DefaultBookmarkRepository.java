@@ -1,4 +1,4 @@
-package com.reza.map.data.repository.bookmark;
+package com.reza.data.repository;
 
 import com.reza.database.BookmarkDao;
 import com.reza.database.BookmarkEntity;

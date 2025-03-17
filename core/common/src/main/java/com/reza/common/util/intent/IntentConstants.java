@@ -5,5 +5,5 @@ public class IntentConstants {
     public static final String ACTION_OPEN_DETAILS = "com.reza.details.ACTION_OPEN_TARGET";
 
     // extras
-    public static final String EXTRA_BOOKMARK_ID = "bookmarkId";
+    public static final String EXTRA_BOOKMARK_ID = "extra_bookmark_id";
 }

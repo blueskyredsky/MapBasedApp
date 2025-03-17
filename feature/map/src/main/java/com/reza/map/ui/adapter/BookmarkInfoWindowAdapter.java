@@ -1,19 +1,15 @@
 package com.reza.map.ui.adapter;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.Marker;
-import com.reza.map.data.model.BookmarkMarker;
+import com.reza.map.data.model.BookmarkMapView;
 import com.reza.map.data.model.PlaceInfo;
 import com.reza.map.databinding.ContentBookmarkInfoBinding;
-
-import java.util.Objects;
 
 public class BookmarkInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
@@ -42,8 +38,8 @@ public class BookmarkInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             if (placeInfo.getPhoto() != null) {
                 binding.photo.setImageBitmap(placeInfo.getPhoto());
             }
-        } else if (tag instanceof BookmarkMarker) {
-            BookmarkMarker bookmark = (BookmarkMarker) tag;
+        } else if (tag instanceof BookmarkMapView) {
+            BookmarkMapView bookmark = (BookmarkMapView) tag;
             binding.photo.setImageBitmap(bookmark.getImage());
         } else {
             Log.e(TAG, "getInfoContents: unable to handle type");

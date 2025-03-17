@@ -1,7 +1,5 @@
 package com.reza.map.di;
 
-import com.reza.map.data.repository.bookmark.BookmarkRepository;
-import com.reza.map.data.repository.bookmark.DefaultBookmarkRepository;
 import com.reza.map.data.repository.location.DefaultLocationRepository;
 import com.reza.map.data.repository.location.LocationRepository;
 import com.reza.map.data.repository.place.DefaultPlaceRepository;
@@ -18,7 +16,4 @@ public abstract class RepositoryModule {
 
     @Binds
     abstract PlaceRepository bindPlaceRepository(DefaultPlaceRepository defaultPlaceRepository);
-
-    @Binds
-    abstract BookmarkRepository bindBookmarkRepository(DefaultBookmarkRepository defaultBookmarkRepository);
 }

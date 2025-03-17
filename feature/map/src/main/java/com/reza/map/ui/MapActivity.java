@@ -39,7 +39,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.reza.common.util.intent.IntentConstants;
 import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
-import com.reza.map.data.model.BookmarkMarker;
+import com.reza.map.data.model.BookmarkMapView;
 import com.reza.map.data.model.PlaceInfo;
 import com.reza.map.di.MapComponent;
 import com.reza.map.di.MapComponentProvider;
@@ -100,9 +100,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapComponent.inject(this);
 
         super.onCreate(savedInstanceState);
-
         viewModel = new ViewModelProvider(this, viewModelFactory).get(MapViewModel.class);
-
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.map), (v, insets) -> {
@@ -136,8 +134,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private boolean handleOnMarkerClickListener(Marker marker) {
         Object tag = marker.getTag();
-        if (tag instanceof BookmarkMarker) {
-            BookmarkMarker bookmark = (BookmarkMarker) tag;
+        if (tag instanceof BookmarkMapView) {
+            BookmarkMapView bookmark = (BookmarkMapView) tag;
             compositeDisposable.add(
                     viewModel.loadBookmarkImage(bookmark.getId(), bookmark)
                             .andThen(Completable.fromAction(marker::showInfoWindow))
@@ -165,8 +163,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         .subscribe());
             }
             marker.remove();
-        } else if (tag instanceof BookmarkMarker) {
-            BookmarkMarker bookmark = (BookmarkMarker) tag;
+        } else if (tag instanceof BookmarkMapView) {
+            BookmarkMapView bookmark = (BookmarkMapView) tag;
             marker.hideInfoWindow();
             startBookmarkDetailsActivity(bookmark.getId());
         } else {
@@ -229,23 +227,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Nullable
-    private Marker addPlaceMarker(@NonNull BookmarkMarker bookmarkMarker) {
+    private Marker addPlaceMarker(@NonNull BookmarkMapView bookmarkMapView) {
         Marker marker = map.addMarker(new MarkerOptions()
-                .position(bookmarkMarker.getLocation())
+                .position(bookmarkMapView.getLocation())
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                .title(bookmarkMarker.getTitle())
-                .snippet(bookmarkMarker.getPhoneNumber())
+                .title(bookmarkMapView.getTitle())
+                .snippet(bookmarkMapView.getPhoneNumber())
                 .alpha(0.8f)
         );
         if (marker != null) {
-            marker.setTag(bookmarkMarker);
+            marker.setTag(bookmarkMapView);
         }
         return marker;
     }
 
-    private void displayAllBookmarks(@NonNull List<BookmarkMarker> bookmarkMarkers) {
-        for (BookmarkMarker bookmarkMarker : bookmarkMarkers) {
-            addPlaceMarker(bookmarkMarker);
+    private void displayAllBookmarks(@NonNull List<BookmarkMapView> bookmarkMapViews) {
+        for (BookmarkMapView bookmarkMapView : bookmarkMapViews) {
+            addPlaceMarker(bookmarkMapView);
         }
     }
 
