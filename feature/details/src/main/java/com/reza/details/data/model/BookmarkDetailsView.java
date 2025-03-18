@@ -5,31 +5,33 @@ import android.graphics.Bitmap;
 import androidx.annotation.Nullable;
 
 public class BookmarkDetailsView {
+
     @Nullable
     private final Long id;
 
     private final String address;
 
-    private final String title;
+    private final String name;
 
     private final String notes;
 
     private final String phoneNumber;
 
+    @Nullable
     private Bitmap image;
 
     public BookmarkDetailsView(@Nullable Long id,
                                String address,
                                String notes,
-                               String title,
+                               String name,
                                String phoneNumber,
                                @Nullable Bitmap image) {
         this.id = id;
         this.address = address;
-        this.title = title;
+        this.notes = notes;
+        this.name = name;
         this.phoneNumber = phoneNumber;
         this.image = image;
-        this.notes = notes;
     }
 
     @Nullable
@@ -41,8 +43,8 @@ public class BookmarkDetailsView {
         return address;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
     public String getPhoneNumber() {

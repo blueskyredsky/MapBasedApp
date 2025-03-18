@@ -22,6 +22,7 @@ public class DatabaseModule {
                         PlaceBookDatabase.class,
                         "placeBook_database"
                 )
+                .fallbackToDestructiveMigration()
                 .build();
     }
 

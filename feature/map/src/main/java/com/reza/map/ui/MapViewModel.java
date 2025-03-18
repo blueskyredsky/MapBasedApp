@@ -75,7 +75,8 @@ public class MapViewModel extends ViewModel {
                 place.getFormattedAddress(),
                 latitude,
                 longitude,
-                place.getInternationalPhoneNumber());
+                place.getInternationalPhoneNumber(),
+                "");
 
         return bookmarkRepository.addBookmark(bookmark);
     }

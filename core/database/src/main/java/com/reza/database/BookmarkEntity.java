@@ -33,7 +33,17 @@ public class BookmarkEntity {
     @ColumnInfo(name = "phone")
     private final String phone;
 
-    public BookmarkEntity(@Nullable Long id, @Nullable String placeId, String name, String address, double latitude, double longitude, String phone) {
+    @ColumnInfo(name = "notes")
+    private final String notes;
+
+    public BookmarkEntity(@Nullable Long id,
+                          @Nullable String placeId,
+                          String name,
+                          String address,
+                          double latitude,
+                          double longitude,
+                          String phone,
+                          String notes) {
         this.id = id;
         this.placeId = placeId;
         this.name = name;
@@ -41,12 +51,19 @@ public class BookmarkEntity {
         this.latitude = latitude;
         this.longitude = longitude;
         this.phone = phone;
+        this.notes = notes;
     }
 
     // Secondary constructor without id
     @Ignore
-    public BookmarkEntity(String placeId, String name, String address, double latitude, double longitude, String phone) {
-        this(null, placeId, name, address, latitude, longitude, phone);
+    public BookmarkEntity(String placeId,
+                          String name,
+                          String address,
+                          double latitude,
+                          double longitude,
+                          String phone,
+                          String notes) {
+        this(null, placeId, name, address, latitude, longitude, phone, notes);
     }
 
     @Nullable
@@ -79,6 +96,10 @@ public class BookmarkEntity {
         return phone;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -90,6 +111,7 @@ public class BookmarkEntity {
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", phone='" + phone + '\'' +
+                ", notes='" + notes + '\'' +
                 '}';
     }
 }
