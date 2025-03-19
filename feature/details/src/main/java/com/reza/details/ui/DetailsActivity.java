@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.reza.common.util.intent.IntentConstants;
 import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.details.databinding.ActivityDetailsBinding;
 import com.reza.details.di.DetailsComponent;
@@ -60,9 +61,28 @@ public class DetailsActivity extends AppCompatActivity {
         });
 
         setupToolbar();
+        getIntentData();
+        observeBookmark();
+    }
+
+    private void observeBookmark() {
+        viewModel.bookmarks.observe(this, bookmark -> {
+            if (bookmark != null) {
+                binding.imageViewPlace.setImageBitmap(bookmark.getImage());
+                binding.editTextName.setText(bookmark.getName());
+                binding.editTextNotes.setText(bookmark.getNotes());
+                binding.editTextPhone.setText(bookmark.getPhoneNumber());
+                binding.editTextAddress.setText(bookmark.getAddress());
+            }
+        });
     }
 
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
+    }
+
+    private void getIntentData() {
+        Long bookmarkId = getIntent().getLongExtra(IntentConstants.EXTRA_BOOKMARK_ID, 0);
+        viewModel.loadBookmarks(bookmarkId);
     }
 }

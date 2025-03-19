@@ -54,7 +54,6 @@ public class DetailsViewModel extends ViewModel {
                                 }).toSingle())
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
-
                         .subscribe(_bookmarks::setValue)
         );
     }
