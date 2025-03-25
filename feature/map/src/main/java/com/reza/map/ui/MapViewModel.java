@@ -21,6 +21,7 @@ import com.reza.map.data.repository.place.PlaceRepository;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -100,6 +101,10 @@ public class MapViewModel extends ViewModel {
                         )
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
+                        .onErrorReturn(throwable -> {
+                            Log.e(TAG, "getBookmarks: " + throwable.getMessage());
+                            return Collections.emptyList();
+                        })
                         .subscribe(_bookmarks::setValue,
                                 throwable -> Log.e(TAG, "getBookmarks: " + throwable.getMessage()))
         );

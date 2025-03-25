@@ -19,7 +19,8 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="@string/details"
-            app:titleTextColor="@android:color/black" />
+            android:background="@color/colorPrimary"
+            app:titleTextColor="@android:color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView

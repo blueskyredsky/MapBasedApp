@@ -1,8 +1,11 @@
 package com.reza.details.ui;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -11,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.reza.common.util.intent.IntentConstants;
 import com.reza.common.viewmodel.ViewModelFactory;
+import com.reza.details.R;
 import com.reza.details.databinding.ActivityDetailsBinding;
 import com.reza.details.di.DetailsComponent;
 import com.reza.details.di.DetailsComponentProvider;
@@ -79,10 +83,30 @@ public class DetailsActivity extends AppCompatActivity {
 
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private void getIntentData() {
         Long bookmarkId = getIntent().getLongExtra(IntentConstants.EXTRA_BOOKMARK_ID, 0);
         viewModel.loadBookmarks(bookmarkId);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_bookmark_details, menu);
+        return true;
     }
 }

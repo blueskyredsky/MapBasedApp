@@ -68,6 +68,16 @@ public class DetailsViewModel extends ViewModel {
         );
     }
 
+    private BookmarkEntity bookmarkDetailsViewToBookmarkEntity(BookmarkDetailsView bookmarkDetailsView) {
+        return new BookmarkEntity(bookmarkDetailsView.getId().toString(),
+                bookmarkDetailsView.getName(),
+                bookmarkDetailsView.getAddress(),
+                0.0,
+                0.0,
+                bookmarkDetailsView.getPhoneNumber(),
+                bookmarkDetailsView.getNotes());
+    }
+
     private Single<BookmarkEntity> getBookmark(Long bookmarkId) {
         return bookmarkRepository.getBookmark(bookmarkId);
     }

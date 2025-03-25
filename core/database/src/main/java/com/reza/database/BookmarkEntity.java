@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "bookmark")
@@ -12,7 +11,7 @@ public class BookmarkEntity {
 
     @PrimaryKey(autoGenerate = true)
     @Nullable
-    private final Long id;
+    private Long id = null;
 
     @ColumnInfo(name = "place_id")
     @Nullable
@@ -36,15 +35,13 @@ public class BookmarkEntity {
     @ColumnInfo(name = "notes")
     private final String notes;
 
-    public BookmarkEntity(@Nullable Long id,
-                          @Nullable String placeId,
+    public BookmarkEntity(@Nullable String placeId,
                           String name,
                           String address,
                           double latitude,
                           double longitude,
                           String phone,
                           String notes) {
-        this.id = id;
         this.placeId = placeId;
         this.name = name;
         this.address = address;
@@ -54,16 +51,8 @@ public class BookmarkEntity {
         this.notes = notes;
     }
 
-    // Secondary constructor without id
-    @Ignore
-    public BookmarkEntity(String placeId,
-                          String name,
-                          String address,
-                          double latitude,
-                          double longitude,
-                          String phone,
-                          String notes) {
-        this(null, placeId, name, address, latitude, longitude, phone, notes);
+    public void setId(@Nullable Long id) {
+        this.id = id;
     }
 
     @Nullable
