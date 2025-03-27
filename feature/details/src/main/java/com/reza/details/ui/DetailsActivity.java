@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.reza.common.util.intent.IntentConstants;
 import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.details.R;
+import com.reza.details.data.model.BookmarkDetailsView;
 import com.reza.details.databinding.ActivityDetailsBinding;
 import com.reza.details.di.DetailsComponent;
 import com.reza.details.di.DetailsComponentProvider;
@@ -45,6 +46,8 @@ public class DetailsActivity extends AppCompatActivity {
     Scheduler mainScheduler;
 
     private DetailsViewModel viewModel;
+
+    private Long bookmarkId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,19 +92,27 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private void getIntentData() {
-        Long bookmarkId = getIntent().getLongExtra(IntentConstants.EXTRA_BOOKMARK_ID, 0);
-        viewModel.loadBookmarks(bookmarkId);
+        bookmarkId = getIntent().getLongExtra(IntentConstants.EXTRA_BOOKMARK_ID, 0);
+        viewModel.loadBookmark(bookmarkId);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_save) {
+            viewModel.updateBookmark(new BookmarkDetailsView(
+                            binding.editTextAddress.getText().toString(),
+                            binding.editTextNotes.getText().toString(),
+                            binding.editTextName.getText().toString(),
+                            binding.editTextPhone.getText().toString(),
+                            null),
+                    bookmarkId);
+            return true;
+        } else if (itemId == android.R.id.home) {
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

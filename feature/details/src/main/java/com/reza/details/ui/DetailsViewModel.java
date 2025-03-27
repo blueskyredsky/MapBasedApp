@@ -1,5 +1,7 @@
 package com.reza.details.ui;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -21,6 +23,8 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class DetailsViewModel extends ViewModel {
 
+    private static final String TAG = "DetailsViewModelTag";
+
     private final Scheduler ioScheduler;
     private final Scheduler mainScheduler;
     private final CompositeDisposable compositeDisposable;
@@ -29,6 +33,9 @@ public class DetailsViewModel extends ViewModel {
 
     private final MutableLiveData<BookmarkDetailsView> _bookmarks = new MutableLiveData<>();
     LiveData<BookmarkDetailsView> bookmarks = _bookmarks;
+
+    private final MutableLiveData<Boolean> _isSavingDone = new MutableLiveData<>();
+    LiveData<Boolean> isSavingDone = _isSavingDone;
 
     @Inject
     public DetailsViewModel(@IoScheduler Scheduler ioScheduler,
@@ -43,7 +50,7 @@ public class DetailsViewModel extends ViewModel {
         this.imageHelper = imageHelper;
     }
 
-    public void loadBookmarks(Long bookmarkId) {
+    public void loadBookmark(Long bookmarkId) {
         compositeDisposable.add(
                 getBookmark(bookmarkId)
                         .map(this::bookmarkEntityToBookmarkDetailsView)
@@ -54,12 +61,14 @@ public class DetailsViewModel extends ViewModel {
                                 }).toSingle())
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
-                        .subscribe(_bookmarks::setValue)
+                        .subscribe(_bookmarks::setValue, throwable -> {
+                            Log.e(TAG, "loadBookmark: " + throwable);
+                        })
         );
     }
 
     private BookmarkDetailsView bookmarkEntityToBookmarkDetailsView(BookmarkEntity bookmarkEntity) {
-        return new BookmarkDetailsView(bookmarkEntity.getId(),
+        return new BookmarkDetailsView(
                 bookmarkEntity.getAddress(),
                 bookmarkEntity.getNotes(),
                 bookmarkEntity.getName(),
@@ -68,12 +77,28 @@ public class DetailsViewModel extends ViewModel {
         );
     }
 
-    private BookmarkEntity bookmarkDetailsViewToBookmarkEntity(BookmarkDetailsView bookmarkDetailsView) {
-        return new BookmarkEntity(bookmarkDetailsView.getId().toString(),
+    public void updateBookmark(BookmarkDetailsView bookmarkDetailsView, Long bookmarkId) {
+        compositeDisposable.add(
+                getBookmark(bookmarkId)
+                        .map(bookmarkEntity -> bookmarkDetailsViewToBookmarkEntity(bookmarkDetailsView, bookmarkEntity))
+                        .flatMapCompletable(bookmarkRepository::updateBookmark)
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainScheduler)
+                        .doOnComplete(() -> _isSavingDone.setValue(true))
+                        .doOnError((throwable) -> {
+                            _isSavingDone.setValue(false);
+                            Log.e(TAG, "updateBookmark: " + throwable);
+                        })
+                        .subscribe()
+        );
+    }
+
+    private BookmarkEntity bookmarkDetailsViewToBookmarkEntity(BookmarkDetailsView bookmarkDetailsView, BookmarkEntity bookmarkEntity) {
+        return new BookmarkEntity(bookmarkEntity.getPlaceId(),
                 bookmarkDetailsView.getName(),
                 bookmarkDetailsView.getAddress(),
-                0.0,
-                0.0,
+                bookmarkEntity.getLatitude(),
+                bookmarkEntity.getLongitude(),
                 bookmarkDetailsView.getPhoneNumber(),
                 bookmarkDetailsView.getNotes());
     }
