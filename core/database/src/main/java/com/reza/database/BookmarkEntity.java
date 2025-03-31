@@ -11,7 +11,7 @@ public class BookmarkEntity {
 
     @PrimaryKey(autoGenerate = true)
     @Nullable
-    private Long id = null;
+    private final Long id;
 
     @ColumnInfo(name = "place_id")
     @Nullable
@@ -35,13 +35,16 @@ public class BookmarkEntity {
     @ColumnInfo(name = "notes")
     private final String notes;
 
-    public BookmarkEntity(@Nullable String placeId,
-                          String name,
-                          String address,
-                          double latitude,
-                          double longitude,
-                          String phone,
-                          String notes) {
+    public BookmarkEntity(
+            @Nullable Long id,
+            @Nullable String placeId,
+            String name,
+            String address,
+            double latitude,
+            double longitude,
+            String phone,
+            String notes) {
+        this.id = id;
         this.placeId = placeId;
         this.name = name;
         this.address = address;
@@ -49,10 +52,6 @@ public class BookmarkEntity {
         this.longitude = longitude;
         this.phone = phone;
         this.notes = notes;
-    }
-
-    public void setId(@Nullable Long id) {
-        this.id = id;
     }
 
     @Nullable

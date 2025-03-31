@@ -84,7 +84,9 @@ public class DetailsViewModel extends ViewModel {
                         .flatMapCompletable(bookmarkRepository::updateBookmark)
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
-                        .doOnComplete(() -> _isSavingDone.setValue(true))
+                        .doOnComplete(() -> {
+                            _isSavingDone.setValue(true);
+                        })
                         .doOnError((throwable) -> {
                             _isSavingDone.setValue(false);
                             Log.e(TAG, "updateBookmark: " + throwable);
@@ -94,7 +96,9 @@ public class DetailsViewModel extends ViewModel {
     }
 
     private BookmarkEntity bookmarkDetailsViewToBookmarkEntity(BookmarkDetailsView bookmarkDetailsView, BookmarkEntity bookmarkEntity) {
-        return new BookmarkEntity(bookmarkEntity.getPlaceId(),
+        return new BookmarkEntity(
+                bookmarkEntity.getId(),
+                bookmarkEntity.getPlaceId(),
                 bookmarkDetailsView.getName(),
                 bookmarkDetailsView.getAddress(),
                 bookmarkEntity.getLatitude(),

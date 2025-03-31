@@ -3,6 +3,7 @@ package com.reza.details.ui;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -70,6 +71,13 @@ public class DetailsActivity extends AppCompatActivity {
         setupToolbar();
         getIntentData();
         observeBookmark();
+        observeIsSavingDone();
+    }
+
+    private void observeIsSavingDone() {
+        viewModel.isSavingDone.observe(this, isSavingDone -> {
+            Toast.makeText(this, R.string.bookmark_saved, Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void observeBookmark() {

@@ -71,7 +71,9 @@ public class MapViewModel extends ViewModel {
         double latitude = LatLngOptional.map(latLng -> latLng.latitude).orElse(0.0);
         double longitude = LatLngOptional.map(latLng -> latLng.longitude).orElse(0.0);
 
-        BookmarkEntity bookmark = new BookmarkEntity(place.getId(),
+        BookmarkEntity bookmark = new BookmarkEntity(
+                null,
+                place.getId(),
                 place.getDisplayName(),
                 place.getFormattedAddress(),
                 latitude,
