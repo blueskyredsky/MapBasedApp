@@ -35,6 +35,9 @@ public class BookmarkEntity {
     @ColumnInfo(name = "notes")
     private final String notes;
 
+    @ColumnInfo(name = "category")
+    private final String category;
+
     public BookmarkEntity(
             @Nullable Long id,
             @Nullable String placeId,
@@ -43,7 +46,8 @@ public class BookmarkEntity {
             double latitude,
             double longitude,
             String phone,
-            String notes) {
+            String notes,
+            String category) {
         this.id = id;
         this.placeId = placeId;
         this.name = name;
@@ -52,6 +56,7 @@ public class BookmarkEntity {
         this.longitude = longitude;
         this.phone = phone;
         this.notes = notes;
+        this.category = category;
     }
 
     @Nullable
@@ -86,6 +91,10 @@ public class BookmarkEntity {
 
     public String getNotes() {
         return notes;
+    }
+
+    public String getCategory() {
+        return category;
     }
 
     @NonNull

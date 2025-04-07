@@ -14,6 +14,7 @@ import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.reza.common.util.imagehelper.ImageHelper;
 import com.reza.data.repository.BookmarkRepository;
+import com.reza.data.repository.DefaultBookmarkRepository;
 import com.reza.database.BookmarkEntity;
 import com.reza.map.data.model.BookmarkMapView;
 import com.reza.map.data.repository.location.LocationRepository;
@@ -79,9 +80,23 @@ public class MapViewModel extends ViewModel {
                 latitude,
                 longitude,
                 place.getInternationalPhoneNumber(),
-                "");
+                "",
+                ""); // fixme added temporarily
 
         return bookmarkRepository.addBookmark(bookmark);
+    }
+
+    private String getPlaceCategory(Place place) {
+        String category = DefaultBookmarkRepository.OTHER;
+        List<String> types = place.getPlaceTypes();
+
+        if (types != null) {
+            if (!types.isEmpty()) {
+                String placeType = types.get(0);
+                category = bookmarkRepository.placeTypeToCategory(placeType);
+            }
+        }
+        return category;
     }
 
     Completable saveImageToFile(@Nullable Bitmap photo, Long bookmarkId) {

@@ -42,4 +42,11 @@ public interface BookmarkRepository {
      * Deletes a bookmark.
      */
     Completable deleteBookmark(BookmarkEntity bookmark);
+
+    /**
+     * Converts a place type to a category.
+     */
+    String placeTypeToCategory(String placeType);
+
+    Integer getCategoryResourceId(String placeCategory);
 }

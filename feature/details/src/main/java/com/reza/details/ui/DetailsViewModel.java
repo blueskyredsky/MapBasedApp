@@ -104,7 +104,8 @@ public class DetailsViewModel extends ViewModel {
                 bookmarkEntity.getLatitude(),
                 bookmarkEntity.getLongitude(),
                 bookmarkDetailsView.getPhoneNumber(),
-                bookmarkDetailsView.getNotes());
+                bookmarkDetailsView.getNotes(),
+                ""); // fixme added temporarily
     }
 
     private Single<BookmarkEntity> getBookmark(Long bookmarkId) {
