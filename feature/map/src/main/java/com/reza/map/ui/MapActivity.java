@@ -180,7 +180,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Place.Field.PHONE_NUMBER,
                 Place.Field.PHOTO_METADATAS,
                 Place.Field.FORMATTED_ADDRESS,
-                Place.Field.LOCATION
+                Place.Field.LOCATION,
+                Place.Field.TYPES
         );
 
         compositeDisposable.add(viewModel.getPlace(placeId, placeFields)
@@ -217,7 +218,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Marker marker = map.addMarker(new MarkerOptions()
                     .position(place.getLocation())
                     .title(place.getDisplayName())
-                    .snippet(place.getPhoneNumber()));
+                    .snippet(place.getPhoneNumber())
+            );
 
             if (marker != null && photo != null) {
                 marker.setTag(new PlaceInfo(place, photo));
@@ -228,13 +230,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Nullable
     private Marker addPlaceMarker(@NonNull BookmarkMapView bookmarkMapView) {
+        Log.i(TAG, "addPlaceMarker: " + bookmarkMapView.getCategoryResourceId());
         Marker marker = map.addMarker(new MarkerOptions()
                 .position(bookmarkMapView.getLocation())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 .title(bookmarkMapView.getTitle())
                 .snippet(bookmarkMapView.getPhoneNumber())
-                .alpha(0.8f)
-        );
+                .icon(BitmapDescriptorFactory.fromResource(bookmarkMapView.getCategoryResourceId()))
+                .alpha(0.8f));
         if (marker != null) {
             marker.setTag(bookmarkMapView);
         }
@@ -243,7 +246,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void displayAllBookmarks(@NonNull List<BookmarkMapView> bookmarkMapViews) {
         for (BookmarkMapView bookmarkMapView : bookmarkMapViews) {
-            addPlaceMarker(bookmarkMapView);
+            try {
+                addPlaceMarker(bookmarkMapView);
+            } catch (Exception e) {
+                Log.e(TAG, "displayAllBookmarks: " + e.getMessage());
+            }
         }
     }
 

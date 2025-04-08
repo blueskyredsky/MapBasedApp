@@ -105,7 +105,7 @@ public class DetailsViewModel extends ViewModel {
                 bookmarkEntity.getLongitude(),
                 bookmarkDetailsView.getPhoneNumber(),
                 bookmarkDetailsView.getNotes(),
-                ""); // fixme added temporarily
+                bookmarkEntity.getCategory()); // fixme added temporarily
     }
 
     private Single<BookmarkEntity> getBookmark(Long bookmarkId) {

@@ -81,7 +81,7 @@ public class MapViewModel extends ViewModel {
                 longitude,
                 place.getInternationalPhoneNumber(),
                 "",
-                ""); // fixme added temporarily
+                getPlaceCategory(place));
 
         return bookmarkRepository.addBookmark(bookmark);
     }
@@ -179,7 +179,8 @@ public class MapViewModel extends ViewModel {
                 new LatLng(bookmarkEntity.getLatitude(), bookmarkEntity.getLongitude()),
                 bookmarkEntity.getName(),
                 bookmarkEntity.getPhone(),
-                null);
+                null,
+                bookmarkRepository.getCategoryResourceId(bookmarkEntity.getCategory()));
     }
 
     Single<Location> getLastLocation() {

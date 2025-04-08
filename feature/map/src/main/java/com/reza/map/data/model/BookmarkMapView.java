@@ -18,16 +18,20 @@ public class BookmarkMapView {
 
     private Bitmap image;
 
+    private final Integer categoryResourceId;
+
     public BookmarkMapView(@Nullable Long id,
                            LatLng location,
                            String title,
                            String phoneNumber,
-                           @Nullable Bitmap image) {
+                           @Nullable Bitmap image,
+                           Integer categoryResourceId) {
         this.id = id;
         this.location = location;
         this.title = title;
         this.phoneNumber = phoneNumber;
         this.image = image;
+        this.categoryResourceId = categoryResourceId;
     }
 
     @Nullable
@@ -45,6 +49,10 @@ public class BookmarkMapView {
 
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    public Integer getCategoryResourceId() {
+        return categoryResourceId;
     }
 
     @Nullable
