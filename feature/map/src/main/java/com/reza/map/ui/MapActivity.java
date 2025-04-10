@@ -230,10 +230,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Nullable
     private Marker addPlaceMarker(@NonNull BookmarkMapView bookmarkMapView) {
-        Log.i(TAG, "addPlaceMarker: " + bookmarkMapView.getCategoryResourceId());
         Marker marker = map.addMarker(new MarkerOptions()
                 .position(bookmarkMapView.getLocation())
-                //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 .title(bookmarkMapView.getTitle())
                 .snippet(bookmarkMapView.getPhoneNumber())
                 .icon(BitmapDescriptorFactory.fromResource(bookmarkMapView.getCategoryResourceId()))
