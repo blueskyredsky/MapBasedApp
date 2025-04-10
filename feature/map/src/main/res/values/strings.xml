@@ -6,4 +6,6 @@
     <string name="description_educational_dialog">This app requires location permission to work properly.</string>
     <string name="you_are_here">You are here!</string>
     <string name="bookmark_image">Bookmark image</string>
+    <string name="map_application">Map Application</string>
+    <string name="header_icon">header icon</string>
 </resources>
