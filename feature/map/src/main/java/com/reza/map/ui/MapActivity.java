@@ -41,6 +41,7 @@ import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
 import com.reza.map.data.model.BookmarkMapView;
 import com.reza.map.data.model.PlaceInfo;
+import com.reza.map.databinding.ActivityMapBinding;
 import com.reza.map.di.MapComponent;
 import com.reza.map.di.MapComponentProvider;
 import com.reza.map.ui.adapter.BookmarkInfoWindowAdapter;
@@ -58,6 +59,8 @@ import io.reactivex.disposables.CompositeDisposable;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String TAG = "MapActivityTag";
+
+    private ActivityMapBinding binding;
 
     @Inject
     CompositeDisposable compositeDisposable;
@@ -102,18 +105,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(this, viewModelFactory).get(MapViewModel.class);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.map), (v, insets) -> {
+        binding = ActivityMapBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.drawerLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            // Apply top padding to the AppBarLayout
+            binding.mainMapView.appbar.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            // Apply the insets to the DrawerLayout as well, if needed for other elements
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        setupToolbar();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+    }
+
+    private void setupToolbar() {
+        setSupportActionBar(binding.mainMapView.toolbar);
     }
 
     @Override

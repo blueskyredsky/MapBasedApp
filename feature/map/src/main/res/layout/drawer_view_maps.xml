@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/header_icon"
-            android:paddingTop="@dimen/_10dp"
+            android:layout_marginTop="@dimen/_30dp"
             app:srcCompat="@drawable/ic_map" />
 
         <TextView
