@@ -16,7 +16,7 @@ import com.reza.common.util.imagehelper.ImageHelper;
 import com.reza.data.repository.BookmarkRepository;
 import com.reza.data.repository.DefaultBookmarkRepository;
 import com.reza.database.BookmarkEntity;
-import com.reza.map.data.model.BookmarkMapView;
+import com.reza.map.data.model.BookmarkView;
 import com.reza.map.data.repository.location.LocationRepository;
 import com.reza.map.data.repository.place.PlaceRepository;
 import com.reza.threading.schedulers.IoScheduler;
@@ -46,8 +46,8 @@ public class MapViewModel extends ViewModel {
     private final Scheduler ioScheduler;
     private final Scheduler mainScheduler;
 
-    private final MutableLiveData<List<BookmarkMapView>> _bookmarks = new MutableLiveData<>();
-    LiveData<List<BookmarkMapView>> bookmarks = _bookmarks;
+    private final MutableLiveData<List<BookmarkView>> _bookmarks = new MutableLiveData<>();
+    LiveData<List<BookmarkView>> bookmarks = _bookmarks;
 
     @Inject
     MapViewModel(LocationRepository locationRepository,
@@ -165,17 +165,17 @@ public class MapViewModel extends ViewModel {
         );*/
     }
 
-    Completable loadBookmarkImage(Long bookmarkId, BookmarkMapView bookmarkMapView) {
+    Completable loadBookmarkImage(Long bookmarkId, BookmarkView bookmarkView) {
         return imageHelper.loadBitmapFromFile(imageHelper.generateImageFilename(bookmarkId))
                 .subscribeOn(ioScheduler)
                 .observeOn(mainScheduler)
                 .flatMapCompletable(bitmap ->
-                        Completable.fromAction(() -> bookmarkMapView.setImage(bitmap))
+                        Completable.fromAction(() -> bookmarkView.setImage(bitmap))
                 );
     }
 
-    private BookmarkMapView bookmarkEntityToBookmarkMarker(BookmarkEntity bookmarkEntity) {
-        return new BookmarkMapView(bookmarkEntity.getId(),
+    private BookmarkView bookmarkEntityToBookmarkMarker(BookmarkEntity bookmarkEntity) {
+        return new BookmarkView(bookmarkEntity.getId(),
                 new LatLng(bookmarkEntity.getLatitude(), bookmarkEntity.getLongitude()),
                 bookmarkEntity.getName(),
                 bookmarkEntity.getPhone(),

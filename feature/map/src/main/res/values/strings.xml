@@ -8,4 +8,7 @@
     <string name="bookmark_image">Bookmark image</string>
     <string name="map_application">Map Application</string>
     <string name="header_icon">header icon</string>
+    <string name="open_drawer">Open Drawer</string>
+    <string name="close_drawer">Close Drawer</string>
+    <string name="bookmarks">Bookmarks</string>
 </resources>

@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
-import com.reza.map.data.model.BookmarkMapView;
+import com.reza.map.data.model.BookmarkView;
 import com.reza.map.data.model.PlaceInfo;
 import com.reza.map.databinding.ContentBookmarkInfoBinding;
 
@@ -38,8 +38,8 @@ public class BookmarkInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             if (placeInfo.getPhoto() != null) {
                 binding.photo.setImageBitmap(placeInfo.getPhoto());
             }
-        } else if (tag instanceof BookmarkMapView) {
-            BookmarkMapView bookmark = (BookmarkMapView) tag;
+        } else if (tag instanceof BookmarkView) {
+            BookmarkView bookmark = (BookmarkView) tag;
             binding.photo.setImageBitmap(bookmark.getImage());
         } else {
             Log.e(TAG, "getInfoContents: unable to handle type");

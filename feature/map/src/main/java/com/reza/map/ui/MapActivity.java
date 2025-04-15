@@ -14,6 +14,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -22,6 +23,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,12 +41,14 @@ import com.google.android.libraries.places.api.model.Place;
 import com.reza.common.util.intent.IntentConstants;
 import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
-import com.reza.map.data.model.BookmarkMapView;
+import com.reza.map.data.model.BookmarkView;
 import com.reza.map.data.model.PlaceInfo;
 import com.reza.map.databinding.ActivityMapBinding;
 import com.reza.map.di.MapComponent;
 import com.reza.map.di.MapComponentProvider;
 import com.reza.map.ui.adapter.BookmarkInfoWindowAdapter;
+import com.reza.map.ui.adapter.BookmarkListAdapter;
+import com.reza.map.ui.adapter.OnBookmarkClickListener;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
@@ -56,7 +60,7 @@ import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnBookmarkClickListener {
 
     private static final String TAG = "MapActivityTag";
 
@@ -79,6 +83,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private MapViewModel viewModel;
 
     private GoogleMap map;
+
+    private BookmarkListAdapter adapter;
 
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
@@ -124,10 +130,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+        setupNavigationDrawer();
     }
 
     private void setupToolbar() {
         setSupportActionBar(binding.mainMapView.toolbar);
+        new ActionBarDrawerToggle(
+                this,
+                binding.drawerLayout,
+                binding.mainMapView.toolbar,
+                R.string.open_drawer,
+                R.string.close_drawer
+        ).syncState();
+    }
+
+    private void setupNavigationDrawer() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        binding.drawerViewMaps.recyclerView.setLayoutManager(layoutManager);
+        adapter = new BookmarkListAdapter(null, this);
+        binding.drawerViewMaps.recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -148,8 +170,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private boolean handleOnMarkerClickListener(Marker marker) {
         Object tag = marker.getTag();
-        if (tag instanceof BookmarkMapView) {
-            BookmarkMapView bookmark = (BookmarkMapView) tag;
+        if (tag instanceof BookmarkView) {
+            BookmarkView bookmark = (BookmarkView) tag;
             compositeDisposable.add(
                     viewModel.loadBookmarkImage(bookmark.getId(), bookmark)
                             .andThen(Completable.fromAction(marker::showInfoWindow))
@@ -177,8 +199,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         .subscribe());
             }
             marker.remove();
-        } else if (tag instanceof BookmarkMapView) {
-            BookmarkMapView bookmark = (BookmarkMapView) tag;
+        } else if (tag instanceof BookmarkView) {
+            BookmarkView bookmark = (BookmarkView) tag;
             marker.hideInfoWindow();
             startBookmarkDetailsActivity(bookmark.getId());
         } else {
@@ -243,23 +265,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Nullable
-    private Marker addPlaceMarker(@NonNull BookmarkMapView bookmarkMapView) {
+    private Marker addPlaceMarker(@NonNull BookmarkView bookmarkView) {
         Marker marker = map.addMarker(new MarkerOptions()
-                .position(bookmarkMapView.getLocation())
-                .title(bookmarkMapView.getTitle())
-                .snippet(bookmarkMapView.getPhoneNumber())
-                .icon(BitmapDescriptorFactory.fromResource(bookmarkMapView.getCategoryResourceId()))
+                .position(bookmarkView.getLocation())
+                .title(bookmarkView.getTitle())
+                .snippet(bookmarkView.getPhoneNumber())
+                .icon(BitmapDescriptorFactory.fromResource(bookmarkView.getCategoryResourceId()))
                 .alpha(0.8f));
         if (marker != null) {
-            marker.setTag(bookmarkMapView);
+            marker.setTag(bookmarkView);
         }
         return marker;
     }
 
-    private void displayAllBookmarks(@NonNull List<BookmarkMapView> bookmarkMapViews) {
-        for (BookmarkMapView bookmarkMapView : bookmarkMapViews) {
+    private void displayAllBookmarks(@NonNull List<BookmarkView> bookmarkViews) {
+        for (BookmarkView bookmarkView : bookmarkViews) {
             try {
-                addPlaceMarker(bookmarkMapView);
+                addPlaceMarker(bookmarkView);
             } catch (Exception e) {
                 Log.e(TAG, "displayAllBookmarks: " + e.getMessage());
             }
@@ -270,6 +292,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         viewModel.bookmarks.observe(this, bookmarkMarkers -> {
             map.clear();
             displayAllBookmarks(bookmarkMarkers);
+            adapter.setBookmarkData(bookmarkMarkers);
         });
     }
 
@@ -374,5 +397,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.dispose();
+    }
+
+    @Override
+    public void onBookmarkClicked(BookmarkView bookmark) {
+
     }
 }

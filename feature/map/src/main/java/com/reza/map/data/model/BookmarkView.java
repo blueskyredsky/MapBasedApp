@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class BookmarkMapView {
+public class BookmarkView {
     @Nullable
     private final Long id;
 
@@ -20,12 +20,12 @@ public class BookmarkMapView {
 
     private final Integer categoryResourceId;
 
-    public BookmarkMapView(@Nullable Long id,
-                           LatLng location,
-                           String title,
-                           String phoneNumber,
-                           @Nullable Bitmap image,
-                           Integer categoryResourceId) {
+    public BookmarkView(@Nullable Long id,
+                        LatLng location,
+                        String title,
+                        String phoneNumber,
+                        @Nullable Bitmap image,
+                        Integer categoryResourceId) {
         this.id = id;
         this.location = location;
         this.title = title;
