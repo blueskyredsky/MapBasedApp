@@ -18,7 +18,7 @@ import io.reactivex.Single;
 @Dao
 public interface BookmarkDao {
 
-    @Query("SELECT * FROM bookmark")
+    @Query("SELECT * FROM bookmark ORDER BY name")
     Flowable<List<BookmarkEntity>> getAllBookmarks();
 
     @Query("SELECT * FROM bookmark WHERE id = :bookmarkId")

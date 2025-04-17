@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -52,6 +53,7 @@ import com.reza.map.ui.adapter.OnBookmarkClickListener;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -85,6 +87,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap map;
 
     private BookmarkListAdapter adapter;
+
+    private HashMap<Long, Marker> markers = new HashMap<>();
 
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
@@ -275,6 +279,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (marker != null) {
             marker.setTag(bookmarkView);
         }
+        markers.put(bookmarkView.getId(), marker);
         return marker;
     }
 
@@ -290,10 +295,28 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void createBookmarkMarkerObserver() {
         viewModel.bookmarks.observe(this, bookmarkMarkers -> {
+            markers.clear();
             map.clear();
             displayAllBookmarks(bookmarkMarkers);
             adapter.setBookmarkData(bookmarkMarkers);
         });
+    }
+
+    private void updateMapToLocation(Location location) {
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f));
+    }
+
+    private void moveToBookmark(BookmarkView bookmarkView) {
+        binding.drawerLayout.closeDrawer(binding.drawerViewMaps.drawerView);
+        Marker marker = markers.get(bookmarkView.getId());
+        if (marker != null) {
+            marker.showInfoWindow();
+        }
+        Location location = new Location("");
+        location.setLatitude(bookmarkView.getLocation().latitude);
+        location.setLongitude(bookmarkView.getLocation().longitude);
+        updateMapToLocation(location);
     }
 
     private void getCurrentLocation() {
@@ -401,6 +424,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onBookmarkClicked(BookmarkView bookmark) {
-
+        moveToBookmark(bookmark);
     }
 }
