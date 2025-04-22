@@ -28,7 +28,9 @@ import javax.inject.Inject;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements PhotoOptionDialogFragment.PhotoOptionDialogListener {
+
+    private static final String TAG = "DetailsActivity";
 
     private ActivityDetailsBinding binding;
 
@@ -72,6 +74,11 @@ public class DetailsActivity extends AppCompatActivity {
         getIntentData();
         observeBookmark();
         observeIsSavingDone();
+        setupListeners();
+    }
+
+    private void setupListeners() {
+        binding.imageViewPlace.setOnClickListener(v -> replaceImage());
     }
 
     private void observeIsSavingDone() {
@@ -127,5 +134,22 @@ public class DetailsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_bookmark_details, menu);
         return true;
+    }
+
+    @Override
+    public void onCaptureClick() {
+        Toast.makeText(this, "Camera Capture", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPickClick() {
+        Toast.makeText(this, "Gallery Pick", Toast.LENGTH_SHORT).show();
+    }
+
+    void replaceImage() {
+        PhotoOptionDialogFragment photoOptionDialogFragment = PhotoOptionDialogFragment.newInstance(this);
+        if (photoOptionDialogFragment != null) {
+            photoOptionDialogFragment.show(getSupportFragmentManager(), TAG);
+        }
     }
 }

@@ -8,4 +8,6 @@
     <string name="details">Details</string>
     <string name="save">Save</string>
     <string name="bookmark_saved">Bookmark saved</string>
+    <string name="photo_option">Photo Option</string>
+    <string name="cancel">Cancel</string>
 </resources>
