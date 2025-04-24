@@ -13,6 +13,7 @@ import com.reza.details.data.model.BookmarkDetailsView;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
+import java.io.File;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -48,6 +49,10 @@ public class DetailsViewModel extends ViewModel {
         this.bookmarkRepository = bookmarkRepository;
         this.compositeDisposable = compositeDisposable;
         this.imageHelper = imageHelper;
+    }
+
+    Single<File> createUniqueImageFile() {
+        return imageHelper.createUniqueImageFile();
     }
 
     public void loadBookmark(Long bookmarkId) {

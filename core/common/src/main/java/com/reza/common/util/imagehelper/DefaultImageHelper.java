@@ -3,17 +3,23 @@ package com.reza.common.util.imagehelper;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 @Singleton
 public class DefaultImageHelper implements ImageHelper {
@@ -59,6 +65,20 @@ public class DefaultImageHelper implements ImageHelper {
                 }
             } catch (Exception exception) {
                 emitter.onError(exception);
+            }
+        });
+    }
+
+    @Override
+    public Single<File> createUniqueImageFile() {
+        return Single.create(emitter -> {
+            String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.UK).format(new Date());
+            String filename = "PlaceBook_" + timeStamp + "_";
+            File filesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            try {
+                emitter.onSuccess(File.createTempFile(filename, ".jpg", filesDir));
+            } catch (IOException ioException) {
+                emitter.onError(ioException);
             }
         });
     }

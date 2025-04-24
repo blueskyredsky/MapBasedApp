@@ -1,13 +1,19 @@
 package com.reza.details.ui;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -22,6 +28,8 @@ import com.reza.details.di.DetailsComponent;
 import com.reza.details.di.DetailsComponentProvider;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -52,6 +60,9 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
 
     private Long bookmarkId;
 
+    private ActivityResultLauncher<Uri> takePictureLauncher;
+    private Uri currentPhotoUri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // providing mapComponent
@@ -69,6 +80,14 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        takePictureLauncher = registerForActivityResult(
+                new ActivityResultContracts.TakePicture(),
+                success -> {
+                    if (success) {
+                        // todo have access to [currentPhotoUri]
+                    }
+                });
 
         setupToolbar();
         getIntentData();
@@ -115,11 +134,16 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.action_save) {
+            String address = binding.editTextAddress.getText() != null ? binding.editTextAddress.getText().toString() : "";
+            String notes = binding.editTextNotes.getText() != null ? binding.editTextNotes.getText().toString() : "";
+            String name = binding.editTextName.getText() != null ? binding.editTextName.getText().toString() : "";
+            String phone = binding.editTextPhone.getText() != null ? binding.editTextPhone.getText().toString() : "";
+
             viewModel.updateBookmark(new BookmarkDetailsView(
-                            binding.editTextAddress.getText().toString(),
-                            binding.editTextNotes.getText().toString(),
-                            binding.editTextName.getText().toString(),
-                            binding.editTextPhone.getText().toString(),
+                            address,
+                            notes,
+                            name,
+                            phone,
                             null),
                     bookmarkId);
             return true;
@@ -138,7 +162,19 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
 
     @Override
     public void onCaptureClick() {
-        Toast.makeText(this, "Camera Capture", Toast.LENGTH_SHORT).show();
+        compositeDisposable.add(
+                viewModel.createUniqueImageFile()
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainScheduler)
+                        .subscribe(file -> {
+                            currentPhotoUri = FileProvider.getUriForFile(this,
+                                    getPackageName() + ".fileprovider",
+                                    file);
+                            takePictureLauncher.launch(currentPhotoUri);
+                        }, throwable -> {
+                            Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        })
+        );
     }
 
     @Override

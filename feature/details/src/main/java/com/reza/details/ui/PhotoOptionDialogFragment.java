@@ -18,7 +18,6 @@ public class PhotoOptionDialogFragment extends DialogFragment {
 
     interface PhotoOptionDialogListener {
         void onCaptureClick();
-
         void onPickClick();
     }
 
