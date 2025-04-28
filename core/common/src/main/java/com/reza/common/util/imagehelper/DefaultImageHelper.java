@@ -3,6 +3,10 @@ package com.reza.common.util.imagehelper;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -10,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -81,6 +86,80 @@ public class DefaultImageHelper implements ImageHelper {
                 emitter.onError(ioException);
             }
         });
+    }
+
+    @Override
+    public Bitmap decodeFileToSize(String filePath, int width, int height) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filePath, options);
+
+        options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, width, height);
+
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(filePath, options);
+    }
+
+    @Override
+    public Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException {
+        InputStream input = null;
+        try {
+            input = context.getContentResolver().openInputStream(selectedImage);
+            String path = selectedImage.getPath();
+            ExifInterface ei;
+            if (input != null) {
+                ei = new ExifInterface(input);
+            } else if (path != null) {
+                ei = new ExifInterface(path);
+            } else {
+                return img;
+            }
+
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    return rotateImage(img, 90.0f);
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    return rotateImage(img, 180.0f);
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return rotateImage(img, 270.0f);
+                default:
+                    return img;
+            }
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private int calculateInSampleSize(int width, int height, int reqWidth, int reqHeight) {
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            int halfHeight = height / 2;
+            int halfWidth = width / 2;
+
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    private Bitmap rotateImage(Bitmap img, float degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
     }
 
     private void saveBytesToFile(byte[] bytes, String filename) {

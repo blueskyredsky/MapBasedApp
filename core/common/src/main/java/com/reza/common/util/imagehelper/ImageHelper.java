@@ -1,6 +1,8 @@
 package com.reza.common.util.imagehelper;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,4 +35,14 @@ public interface ImageHelper {
      * Creates a unique file for an image.
      */
     Single<File> createUniqueImageFile();
+
+    /**
+     * Decodes a file into a Bitmap.
+     */
+    Bitmap decodeFileToSize(String filePath, int width, int height);
+
+    /**
+     * Rotates an image if required.
+     */
+    Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException;
 }

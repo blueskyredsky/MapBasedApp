@@ -1,9 +1,7 @@
 package com.reza.details.ui;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -28,8 +26,6 @@ import com.reza.details.di.DetailsComponent;
 import com.reza.details.di.DetailsComponentProvider;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
-
-import java.io.File;
 
 import javax.inject.Inject;
 
