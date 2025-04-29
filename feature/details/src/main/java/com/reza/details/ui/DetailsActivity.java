@@ -1,7 +1,9 @@
 package com.reza.details.ui;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -26,6 +28,9 @@ import com.reza.details.di.DetailsComponent;
 import com.reza.details.di.DetailsComponentProvider;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
+
+import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Inject;
 
@@ -58,6 +63,7 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
 
     private ActivityResultLauncher<Uri> takePictureLauncher;
     private Uri currentPhotoUri;
+    private File currentPhotoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,19 +83,48 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
             return insets;
         });
 
-        takePictureLauncher = registerForActivityResult(
-                new ActivityResultContracts.TakePicture(),
-                success -> {
-                    if (success) {
-                        // todo have access to [currentPhotoUri]
-                    }
-                });
-
+        initPictureLauncher();
         setupToolbar();
         getIntentData();
         observeBookmark();
         observeIsSavingDone();
         setupListeners();
+    }
+
+    private void initPictureLauncher() {
+        takePictureLauncher = registerForActivityResult(
+                new ActivityResultContracts.TakePicture(),
+                success -> {
+                    if (success) {
+                        Bitmap bitmap = viewModel.getImageWithPath(
+                                currentPhotoFile.getAbsolutePath(),
+                                getResources().getDimensionPixelSize(com.reza.common.R.dimen.default_image_width),
+                                getResources().getDimensionPixelSize(com.reza.common.R.dimen.default_image_height)
+                        );
+                        try {
+                            Bitmap modifiedImage = viewModel.rotateImageIfRequired(bitmap, currentPhotoUri);
+                            updateImage(modifiedImage);
+                        } catch (IOException e) {
+                            Log.e(TAG, "Error rotating image" + e.getMessage());
+                        }
+                    } else {
+                        // Handle the case where taking the picture was cancelled or failed
+                        if (currentPhotoFile != null) {
+                            currentPhotoFile.delete();
+                        }
+                    }
+                });
+    }
+
+    private void updateImage(Bitmap image) {
+        binding.imageViewPlace.setImageBitmap(image);
+        compositeDisposable.add(viewModel.saveImageToFile(image, bookmarkId)
+                .subscribeOn(ioScheduler)
+                .observeOn(mainScheduler)
+                .subscribe(() -> Toast.makeText(this, R.string.image_saved, Toast.LENGTH_SHORT).show(),
+                        throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                )
+        );
     }
 
     private void setupListeners() {
@@ -163,6 +198,7 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
                         .subscribe(file -> {
+                            currentPhotoFile = file;
                             currentPhotoUri = FileProvider.getUriForFile(this,
                                     getPackageName() + ".fileprovider",
                                     file);

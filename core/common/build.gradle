@@ -6,4 +6,5 @@ android {
 
 dependencies {
 
+implementation libs.exifinterface
 }

@@ -1,7 +1,10 @@
 package com.reza.details.ui;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -14,10 +17,12 @@ import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
@@ -51,8 +56,25 @@ public class DetailsViewModel extends ViewModel {
         this.imageHelper = imageHelper;
     }
 
+    Completable saveImageToFile(@Nullable Bitmap photo, Long bookmarkId) {
+        if (photo != null) {
+            String filename = imageHelper.generateImageFilename(bookmarkId);
+            return imageHelper.saveBitmapToFile(photo, filename);
+        } else {
+            return Completable.complete(); // Complete without doing anything
+        }
+    }
+
     Single<File> createUniqueImageFile() {
         return imageHelper.createUniqueImageFile();
+    }
+
+    Bitmap getImageWithPath(String filePath, int width, int height) {
+        return imageHelper.decodeFileToSize(filePath, width, height);
+    }
+
+    Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException {
+        return imageHelper.rotateImageIfRequired(img, selectedImage);
     }
 
     public void loadBookmark(Long bookmarkId) {

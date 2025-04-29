@@ -4,9 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
+import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -133,7 +132,7 @@ public class DefaultImageHelper implements ImageHelper {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "rotateImageIfRequired: " + e.getMessage());
                 }
             }
         }
