@@ -45,4 +45,9 @@ public interface ImageHelper {
      * Rotates an image if required.
      */
     Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException;
+
+    /**
+     * Decodes a stream into a Bitmap.
+     */
+    Bitmap decodeUriStreamToSize(Uri uri, int width, int height);
 }

@@ -1,5 +1,7 @@
 package com.reza.details.ui;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -62,6 +64,7 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
     private Long bookmarkId;
 
     private ActivityResultLauncher<Uri> takePictureLauncher;
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
     private Uri currentPhotoUri;
     private File currentPhotoFile;
 
@@ -84,11 +87,37 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
         });
 
         initPictureLauncher();
+        initPickerLauncher();
         setupToolbar();
         getIntentData();
         observeBookmark();
         observeIsSavingDone();
         setupListeners();
+    }
+
+    private void initPickerLauncher() {
+        imagePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null && data.getData() != null) {
+                            Uri selectedImageUri = data.getData();
+                            Bitmap bitmap = viewModel.getImageWithUri(
+                                    selectedImageUri,
+                                    getResources().getDimensionPixelSize(com.reza.common.R.dimen.default_image_width),
+                                    getResources().getDimensionPixelSize(com.reza.common.R.dimen.default_image_height)
+                            );
+                            try {
+                                Bitmap modifiedImage = viewModel.rotateImageIfRequired(bitmap, selectedImageUri);
+                                updateImage(modifiedImage);
+                            } catch (IOException e) {
+                                Log.e(TAG, "Error rotating image" + e.getMessage());
+                            }
+                        }
+                    } else {
+                        Toast.makeText(this, "Image selection cancelled", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void initPictureLauncher() {
@@ -211,7 +240,9 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
 
     @Override
     public void onPickClick() {
-        Toast.makeText(this, "Gallery Pick", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        imagePickerLauncher.launch(intent);
     }
 
     void replaceImage() {

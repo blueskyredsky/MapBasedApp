@@ -138,6 +138,41 @@ public class DefaultImageHelper implements ImageHelper {
         }
     }
 
+    @Override
+    public Bitmap decodeUriStreamToSize(Uri uri, int width, int height) {
+        InputStream inputStream = null;
+        try {
+            BitmapFactory.Options options;
+            inputStream = context.getContentResolver().openInputStream(uri);
+            if (inputStream != null) {
+                options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = false;
+                BitmapFactory.decodeStream(inputStream, null, options);
+                inputStream.close();
+                inputStream = context.getContentResolver().openInputStream(uri);
+                if (inputStream != null) {
+                    options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, width, height);
+                    options.inJustDecodeBounds = false;
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+                    inputStream.close();
+                    return bitmap;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            Log.e(TAG, "decodeUriStreamToSize: " + e.getMessage());
+            return null;
+        } finally {
+            try {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "decodeUriStreamToSize: " + e.getMessage());
+            }
+        }
+    }
+
     private int calculateInSampleSize(int width, int height, int reqWidth, int reqHeight) {
         int inSampleSize = 1;
 

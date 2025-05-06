@@ -73,6 +73,10 @@ public class DetailsViewModel extends ViewModel {
         return imageHelper.decodeFileToSize(filePath, width, height);
     }
 
+    Bitmap getImageWithUri(Uri imageUri, int width, int height) {
+        return imageHelper.decodeUriStreamToSize(imageUri, width, height);
+    }
+
     Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException {
         return imageHelper.rotateImageIfRequired(img, selectedImage);
     }
