@@ -104,6 +104,7 @@ public class DetailsViewModel extends ViewModel {
                 bookmarkEntity.getNotes(),
                 bookmarkEntity.getName(),
                 bookmarkEntity.getPhone(),
+                bookmarkEntity.getCategory(),
                 null
         );
     }
@@ -141,6 +142,10 @@ public class DetailsViewModel extends ViewModel {
 
     private Single<BookmarkEntity> getBookmark(Long bookmarkId) {
         return bookmarkRepository.getBookmark(bookmarkId);
+    }
+
+    public List<String> getCategories() {
+        return bookmarkRepository.getCategories();
     }
 
     @Override

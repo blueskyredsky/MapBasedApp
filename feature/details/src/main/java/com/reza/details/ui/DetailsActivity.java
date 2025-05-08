@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -33,6 +36,7 @@ import com.reza.threading.schedulers.MainScheduler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -62,6 +66,7 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
     private DetailsViewModel viewModel;
 
     private Long bookmarkId;
+    private String category;
 
     private ActivityResultLauncher<Uri> takePictureLauncher;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
@@ -186,7 +191,8 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
     }
 
     private void getIntentData() {
-        bookmarkId = getIntent().getLongExtra(IntentConstants.EXTRA_BOOKMARK_ID, 0);
+        bookmarkId = getIntent().getLongExtra(IntentConstants.EXTRA_BOOKMARK_ID, -1);
+        category = getIntent().getStringExtra(IntentConstants.EXTRA_CATEGORY);
         viewModel.loadBookmark(bookmarkId);
     }
 
@@ -204,6 +210,7 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
                             notes,
                             name,
                             phone,
+                            "",
                             null),
                     bookmarkId);
             return true;
@@ -251,4 +258,22 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
             photoOptionDialogFragment.show(getSupportFragmentManager(), TAG);
         }
     }
+
+    /*private void populateCategoryList() {
+        if (categoryResourceId != null) {
+            binding.imageViewCategory.setImageResource(categoryResourceId);
+        }
+
+        List<String> categories = viewModel.getCategories();
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, categories);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        binding.spinnerCategory.setAdapter(adapter);
+
+        String placeCategory = bookmarkView.getCategory();
+        binding.spinnerCategory.setSelection(adapter.getPosition(placeCategory));
+    }*/
+
 }

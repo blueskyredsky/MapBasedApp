@@ -14,19 +14,23 @@ public class BookmarkDetailsView {
 
     private final String phoneNumber;
 
+    private final String category;
+
     @Nullable
     private Bitmap image;
 
     public BookmarkDetailsView(
-                               String address,
-                               String notes,
-                               String name,
-                               String phoneNumber,
-                               @Nullable Bitmap image) {
+            String address,
+            String notes,
+            String name,
+            String phoneNumber,
+            String category,
+            @Nullable Bitmap image) {
         this.address = address;
         this.notes = notes;
         this.name = name;
         this.phoneNumber = phoneNumber;
+        this.category = category;
         this.image = image;
     }
 
@@ -53,5 +57,9 @@ public class BookmarkDetailsView {
 
     public void setImage(Bitmap image) {
         this.image = image;
+    }
+
+    public String getCategory() {
+        return category;
     }
 }

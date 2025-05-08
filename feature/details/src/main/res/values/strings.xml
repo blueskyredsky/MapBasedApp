@@ -11,4 +11,5 @@
     <string name="photo_option">Photo Option</string>
     <string name="cancel">Cancel</string>
     <string name="image_saved">Image saved</string>
+    <string name="category">Category</string>
 </resources>

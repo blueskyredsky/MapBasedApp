@@ -6,4 +6,5 @@ public class IntentConstants {
 
     // extras
     public static final String EXTRA_BOOKMARK_ID = "extra_bookmark_id";
+    public static final String EXTRA_CATEGORY = "extra_category";
 }

@@ -5,8 +5,10 @@ import com.reza.data.R;
 import com.reza.database.BookmarkDao;
 import com.reza.database.BookmarkEntity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -70,6 +72,11 @@ public class DefaultBookmarkRepository implements BookmarkRepository {
     @Override
     public Integer getCategoryResourceId(String placeCategory) {
         return allCategories.get(placeCategory);
+    }
+
+    @Override
+    public List<String> getCategories() {
+        return new ArrayList<>(allCategories.keySet());
     }
 
     private final HashMap<String , String> categoryMap = buildCategoryMap();

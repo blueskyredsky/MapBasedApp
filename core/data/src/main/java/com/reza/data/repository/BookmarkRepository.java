@@ -48,5 +48,13 @@ public interface BookmarkRepository {
      */
     String placeTypeToCategory(String placeType);
 
+    /**
+     * Retrieves the resource ID for a category.
+     */
     Integer getCategoryResourceId(String placeCategory);
+
+    /**
+     * Retrieves a list of categories.
+     */
+    List<String> getCategories();
 }
