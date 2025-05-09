@@ -103,7 +103,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void startBookmarkDetailsActivity(Long bookmarkId) {
         Intent intent = new Intent(IntentConstants.ACTION_OPEN_DETAILS);
         intent.putExtra(IntentConstants.EXTRA_BOOKMARK_ID, bookmarkId);
-        intent.putExtra(IntentConstants.EXTRA_CATEGORY, "");
         startActivity(intent);
     }
 

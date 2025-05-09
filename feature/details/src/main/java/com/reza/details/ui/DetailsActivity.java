@@ -174,11 +174,13 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
     private void observeBookmark() {
         viewModel.bookmarks.observe(this, bookmark -> {
             if (bookmark != null) {
+                category = bookmark.getCategory(); // todo find a better way to handle this (get categories from intent)
                 binding.imageViewPlace.setImageBitmap(bookmark.getImage());
                 binding.editTextName.setText(bookmark.getName());
                 binding.editTextNotes.setText(bookmark.getNotes());
                 binding.editTextPhone.setText(bookmark.getPhoneNumber());
                 binding.editTextAddress.setText(bookmark.getAddress());
+                populateCategoryList();
             }
         });
     }
@@ -192,7 +194,6 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
 
     private void getIntentData() {
         bookmarkId = getIntent().getLongExtra(IntentConstants.EXTRA_BOOKMARK_ID, -1);
-        category = getIntent().getStringExtra(IntentConstants.EXTRA_CATEGORY);
         viewModel.loadBookmark(bookmarkId);
     }
 
@@ -204,13 +205,14 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
             String notes = binding.editTextNotes.getText() != null ? binding.editTextNotes.getText().toString() : "";
             String name = binding.editTextName.getText() != null ? binding.editTextName.getText().toString() : "";
             String phone = binding.editTextPhone.getText() != null ? binding.editTextPhone.getText().toString() : "";
+            String category = (String) binding.spinnerCategory.getSelectedItem();
 
             viewModel.updateBookmark(new BookmarkDetailsView(
                             address,
                             notes,
                             name,
                             phone,
-                            "",
+                            category,
                             null),
                     bookmarkId);
             return true;
@@ -259,21 +261,37 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
         }
     }
 
-    /*private void populateCategoryList() {
+    private void populateCategoryList() {
+        if (category == null) { // todo find a better way to handle this (get categories from intent)
+            return;
+        }
+
+        Integer categoryResourceId = viewModel.getCategoryResourceId(category);
         if (categoryResourceId != null) {
             binding.imageViewCategory.setImageResource(categoryResourceId);
         }
 
         List<String> categories = viewModel.getCategories();
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, categories);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         binding.spinnerCategory.setAdapter(adapter);
+        binding.spinnerCategory.setSelection(adapter.getPosition(category));
 
-        String placeCategory = bookmarkView.getCategory();
-        binding.spinnerCategory.setSelection(adapter.getPosition(placeCategory));
-    }*/
+        binding.spinnerCategory.post(() -> binding.spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String category = (String) parent.getItemAtPosition(position);
+                Integer resourceId = viewModel.getCategoryResourceId(category);
+                if (resourceId != null) {
+                    binding.imageViewCategory.setImageResource(resourceId);
+                }
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // NOTE: This method is required but not used.
+            }
+        }));
+    }
 }

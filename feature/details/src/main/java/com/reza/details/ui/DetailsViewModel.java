@@ -92,9 +92,7 @@ public class DetailsViewModel extends ViewModel {
                                 }).toSingle())
                         .subscribeOn(ioScheduler)
                         .observeOn(mainScheduler)
-                        .subscribe(_bookmarks::setValue, throwable -> {
-                            Log.e(TAG, "loadBookmark: " + throwable);
-                        })
+                        .subscribe(_bookmarks::setValue, throwable -> Log.e(TAG, "loadBookmark: " + throwable))
         );
     }
 
@@ -107,6 +105,10 @@ public class DetailsViewModel extends ViewModel {
                 bookmarkEntity.getCategory(),
                 null
         );
+    }
+
+    public Integer getCategoryResourceId(String category) {
+        return bookmarkRepository.getCategoryResourceId(category);
     }
 
     public void updateBookmark(BookmarkDetailsView bookmarkDetailsView, Long bookmarkId) {
@@ -137,7 +139,7 @@ public class DetailsViewModel extends ViewModel {
                 bookmarkEntity.getLongitude(),
                 bookmarkDetailsView.getPhoneNumber(),
                 bookmarkDetailsView.getNotes(),
-                bookmarkEntity.getCategory()); // fixme added temporarily
+                bookmarkDetailsView.getCategory());
     }
 
     private Single<BookmarkEntity> getBookmark(Long bookmarkId) {
