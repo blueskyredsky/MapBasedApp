@@ -174,7 +174,7 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
     private void observeBookmark() {
         viewModel.bookmarks.observe(this, bookmark -> {
             if (bookmark != null) {
-                category = bookmark.getCategory(); // todo find a better way to handle this (get categories from intent)
+                category = bookmark.getCategory();
                 binding.imageViewPlace.setImageBitmap(bookmark.getImage());
                 binding.editTextName.setText(bookmark.getName());
                 binding.editTextNotes.setText(bookmark.getNotes());
@@ -262,7 +262,7 @@ public class DetailsActivity extends AppCompatActivity implements PhotoOptionDia
     }
 
     private void populateCategoryList() {
-        if (category == null) { // todo find a better way to handle this (get categories from intent)
+        if (category == null) {
             return;
         }
 

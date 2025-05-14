@@ -2,6 +2,7 @@ package com.reza.map.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,6 +12,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -23,9 +26,13 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -34,11 +41,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.reza.common.util.intent.IntentConstants;
 import com.reza.common.viewmodel.ViewModelFactory;
 import com.reza.map.R;
@@ -53,6 +65,7 @@ import com.reza.map.ui.adapter.OnBookmarkClickListener;
 import com.reza.threading.schedulers.IoScheduler;
 import com.reza.threading.schedulers.MainScheduler;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -100,6 +113,71 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             });
 
+    private ActivityResultLauncher<Intent> autocompleteLauncher;
+
+    private void initialiseAutocompleteLauncher() {
+        autocompleteLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::handleAutocompleteResult
+        );
+    }
+
+    private void handleAutocompleteResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            Intent data = result.getData();
+            if (data != null) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+                Location location = new Location("");
+                if (place.getLocation() != null) {
+                    location.setLatitude(place.getLocation().latitude);
+                    location.setLongitude(place.getLocation().longitude);
+                }
+                updateMapToLocation(location);
+                displayPoiGetPhotoStep(place);
+            }
+        } else if (result.getResultCode() == AutocompleteActivity.RESULT_ERROR) {
+            // Handle the error.
+            Intent data = result.getData();
+            if (data != null) {
+                Status status = Autocomplete.getStatusFromIntent(data);
+                Log.e("Autocomplete Error", "Place: " + status.getStatusMessage());
+                Toast.makeText(this, "Error: " + status.getStatusMessage(), Toast.LENGTH_LONG).show();
+            } else {
+                Log.e("Autocomplete Error", "Intent Data is Null");
+                Toast.makeText(this, "Error: Intent Data is Null", Toast.LENGTH_LONG).show();
+            }
+        } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
+            // The user canceled the operation.
+            Toast.makeText(this, "Search Canceled", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void searchAtCurrentLocation() {
+        List<Place.Field> placeFields = Arrays.asList(
+                Place.Field.ID,
+                Place.Field.DISPLAY_NAME,
+                Place.Field.NATIONAL_PHONE_NUMBER,
+                Place.Field.PHOTO_METADATAS,
+                Place.Field.LOCATION,
+                Place.Field.FORMATTED_ADDRESS,
+                Place.Field.TYPES);
+
+        LatLngBounds latLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
+        RectangularBounds bounds = RectangularBounds.newInstance(latLngBounds);
+
+        try {
+            Intent intent = new Autocomplete.IntentBuilder(
+                    AutocompleteActivityMode.OVERLAY, placeFields)
+                    .setLocationBias(bounds)
+                    .build(this);
+
+            autocompleteLauncher.launch(intent);
+        } catch (Exception e) {
+            Log.e(TAG, "searchAtCurrentLocation: " + e.getMessage());
+            Toast.makeText(this, "Problems Searching: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void startBookmarkDetailsActivity(Long bookmarkId) {
         Intent intent = new Intent(IntentConstants.ACTION_OPEN_DETAILS);
         intent.putExtra(IntentConstants.EXTRA_BOOKMARK_ID, bookmarkId);
@@ -127,6 +205,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             return insets;
         });
 
+        initialiseAutocompleteLauncher();
         setupToolbar();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -136,6 +215,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         setupNavigationDrawer();
+        setupListeners();
+    }
+
+    private void setupListeners() {
+        binding.mainMapView.fab.setOnClickListener(v -> searchAtCurrentLocation());
     }
 
     private void setupToolbar() {
